@@ -1,0 +1,39 @@
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    color: white;
+    background-color: #3E465C;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    justify-content: space-evenly;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+day {
+    border: 5px solid white;
+    width:  75vmin;
+    height: 75vmin;
+    border-radius: 50%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    /* opacity: .5; */
+    background-image:
+            /* Dawn */
+            linear-gradient(0deg, #222222 50%, transparent 50%),
+            /* Dusk */
+            linear-gradient(180deg, transparent 50%, #222222 40%);
+}
+
+hour {
+    background-color: white;
+    position: absolute;
+    width: 5px;
+    height: 2vmin;
+}
