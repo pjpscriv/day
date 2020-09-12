@@ -51,11 +51,9 @@ function add_hours() {
     day.style.borderWidth = line_width+"px";
 }
 
-
 function get_day_times(here, now) {
     return SunCalc.getTimes(now, here.coords.latitude, here.coords.longitude);
 }
-
 
 function get_angle(date) {
     var day_ms = 24*60*60*1000;
@@ -68,23 +66,45 @@ function get_angle(date) {
     return (circle_percent * 2*Math.PI) - Math.PI/2;
 }
 
+function add_now(day, time) {
+    var now = document.createElement('now');
+
+    var line_width = 2;
+    var dp = 1000;
+
+    var day_ms = 24*60*60*1000;
+    var ms = time.getHours()*60*60*1000;
+    ms += time.getMinutes()*60*1000;
+    ms += time.getSeconds()*1000;
+    ms += time.getMilliseconds();
+
+    var rotation = 2*Math.PI * (ms/day_ms);
+
+    let y = Math.round((Math.sin(rotation) * 35.8)*dp) / dp * -1;
+    let x = Math.round((Math.cos(rotation) * 35.8)*dp) / dp;
+
+    now.style.transform = `translate(${y}vmin, ${x}vmin) rotate(${rotation}rad)`;
+    now.style.width = line_width+"px";
+    now.id = "now";
+    day.appendChild(now);
+}
 
 window.onload = () => {
-    
-    add_hours();
-    
-    // Time
-    var time = document.getElementById("time");
-    var location = document.getElementById("location");
-    var sunrise = document.getElementById("sunrise");
-    var sunset = document.getElementById("sunset");
-    var day = document.getElementById("day");
     
     var now = new Date();
     var here = "";
     var night_color = "#222222 50%";
     var day_color = "#3E465C 50%";
     var transparent = "transparent 50%";
+    
+    var time = document.getElementById("time");
+    var location = document.getElementById("location");
+    var sunrise = document.getElementById("sunrise");
+    var sunset = document.getElementById("sunset");
+    var day = document.getElementById("day");
+    
+    add_hours();
+    add_now(day, now);
 
     // Get Location
     if (navigator.geolocation) {

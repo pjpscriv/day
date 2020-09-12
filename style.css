@@ -33,3 +33,10 @@ hour {
     width: 5px;
     height: 2vmin;
 }
+
+now {
+    background-color: tomato;
+    position: absolute;
+    width: 5px;
+    height: 4vmin;
+}
