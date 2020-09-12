@@ -13,7 +13,7 @@ html, body {
 }
 
 day {
-    /* border: 5px solid white; */
+    border: 5px solid white;
     width:  75vmin;
     height: 75vmin;
     border-radius: 50%;
@@ -36,6 +36,20 @@ hour {
 
 now {
     background-color: tomato;
+    position: absolute;
+    width: 5px;
+    height: 6vmin;
+}
+
+solarnoon {
+    background-color: gold;
+    position: absolute;
+    width: 5px;
+    height: 6vmin;
+}
+
+nadir {
+    background-color: #eeeeee;
     position: absolute;
     width: 5px;
     height: 6vmin;
