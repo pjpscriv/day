@@ -80,8 +80,8 @@ function add_now(day, time) {
 
     var rotation = 2*Math.PI * (ms/day_ms);
 
-    let y = Math.round((Math.sin(rotation) * 35.8)*dp) / dp * -1;
-    let x = Math.round((Math.cos(rotation) * 35.8)*dp) / dp;
+    let y = Math.round((Math.sin(rotation) * 34.8)*dp) / dp * -1;
+    let x = Math.round((Math.cos(rotation) * 34.8)*dp) / dp;
 
     now.style.transform = `translate(${y}vmin, ${x}vmin) rotate(${rotation}rad)`;
     now.style.width = line_width+"px";
