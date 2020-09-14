@@ -17,6 +17,11 @@ const sunrise_tag  = document.getElementById("sunrise");
 const sunset_tag   = document.getElementById("sunset");
 const day_tag      = document.getElementById("day");
 
+// Helper
+function addListeners(element, events, fn) {
+    events.split(' ').forEach(e => element.addEventListener(e, fn, false));
+}
+
 
 // Prettifiers
 function pretty_time(d) {
@@ -78,34 +83,49 @@ function get_angle(date) {
 }
 
 function add_time(time, name) {
+
+    var today = new Date()
+
     var tag = document.getElementById(name);
     if (tag == null) {
         tag = document.createElement(name);
     }
+
+    // console.log("now:", name === "now")
+    // console.log(pretty_day(time))
+    // console.log(pretty_day(today))
+    // console.log("Not Equal:", pretty_day(time) !== pretty_day(today))
     
-    var dp = 1000;
-    var ms = time.getHours()*60*60*1000;
-    ms += time.getMinutes()*60*1000;
-    ms += time.getSeconds()*1000;
-    ms += time.getMilliseconds();
+    
+    if (name === "now" && pretty_day(time) !== pretty_day(today)) {
+        tag.style.display = "none";
+    } else {
+        var dp = 1000;
+        var ms = time.getHours()*60*60*1000;
+        ms += time.getMinutes()*60*1000;
+        ms += time.getSeconds()*1000;
+        ms += time.getMilliseconds();
 
-    var rotation = 2*Math.PI * (ms/day_ms);
+        var rotation = 2*Math.PI * (ms/day_ms);
 
-    let y = Math.round((Math.sin(rotation) * 34.5)*dp) / dp * -1;
-    let x = Math.round((Math.cos(rotation) * 34.5)*dp) / dp;
+        let y = Math.round((Math.sin(rotation) * 34.5)*dp) / dp * -1;
+        let x = Math.round((Math.cos(rotation) * 34.5)*dp) / dp;
 
-    tag.style.transform = `translate(${y}vmin, ${x}vmin) rotate(${rotation}rad)`;
-    tag.style.width = line_width+"px";
-    tag.id = name;
-    day_tag.appendChild(tag);
+        tag.style.display = "block"
+        tag.style.transform = `translate(${y}vmin, ${x}vmin) rotate(${rotation}rad)`;
+        tag.style.width = line_width+"px";
+        tag.id = name;
+        day_tag.appendChild(tag);
+    }
 }
 
-function update_position(here, now) {
+function update(here, now) {
 
     var times = get_sun_times(here, now);
     console.log(times);
 
     // Set Values
+    time_tag.innerHTML     = pretty_day(now);
     location_tag.innerHTML = pretty_location(here);
     sunrise_tag.innerHTML  = pretty_time(times.sunrise);
     sunset_tag.innerHTML   = pretty_time(times.sunset);
@@ -115,18 +135,21 @@ function update_position(here, now) {
     var sunset_angle  = get_angle(times.sunset);
     if ((times.sunset - times.sunrise) > (day_ms / 2)) {
         // Longer Day
-        gradient = `linear-gradient(${sunrise_angle}rad, ${transparent} 50%, ${day_color} 50%),
-                    linear-gradient(${sunset_angle}rad, ${night_color} 50%, ${transparent} 50%)`;
+        gradient = `linear-gradient(${sunrise_angle}rad, ${night_color} 50%, ${transparent} 50%),
+                    linear-gradient(${sunset_angle}rad, ${transparent} 50%, ${day_color} 50%)`;
     } else {
         // Longer Night
         gradient = `linear-gradient(${sunrise_angle}rad, ${night_color} 50%, ${transparent} 50%), 
                     linear-gradient(${sunset_angle}rad, ${transparent} 50%, ${night_color} 50%)`
     }
     day_tag.style.backgroundImage = gradient;
+
+    // Add Times
+    add_time(now, 'now');
     add_time(times.solarNoon, 'solarnoon');
     add_time(times.nadir, 'nadir');
 
-    console.log("Updated", pretty_time(now));
+    console.log("Updated", pretty_day(now), pretty_time(now));
 }
 
 
@@ -135,28 +158,37 @@ window.onload = () => {
     add_hours(24);
     day_tag.style.backgroundColor = day_color;
 
-    // Get Time
-    var now = new Date();
+    // Time
+    var day_move = 0;
+    var now = new Date(Date.now() + (day_move * day_ms));
     add_time(now, 'now');
-    time_tag.innerHTML = pretty_day(now);
 
-    // Get Location
+    // Location
     var here = null;
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
             here = position;
-            update_position(here, now);
+            update(here, now);
         });
     } else {
         here = "Your browser is too old to share your location :'(";
         location.innerHTML = pretty_location(here);
     }
 
+    addListeners(document.getElementById('previous_day'), 'click', () => {
+        day_move -= 1;
+        var now = new Date(Date.now() + (day_move * day_ms));
+        update(here, now);
+    })
+    addListeners(document.getElementById('next_day'), 'click', () => {
+        day_move += 1;
+        var now = new Date(Date.now() + (day_move * day_ms));
+        update(here, now);
+    })
+
     // Update
     setInterval(() => {
-        var now = new Date();
-        add_time(now, 'now');
-        time_tag.innerHTML = pretty_day(now);
-        update_position(here, now)
+        var now = new Date(Date.now() + (day_move * day_ms));
+        update(here, now)
     }, 30*1000);
 }
