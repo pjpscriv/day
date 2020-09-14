@@ -20,7 +20,7 @@ html, body {
     width: 100%;
 }
 
-.material-icons {
+#top * {
     cursor: pointer;
 }
 

@@ -10,6 +10,10 @@ const night_color = "#222222";
 const transparent = "transparent";
 const line_width  = 4;
 
+// Debug Styles
+// const day_color   = "#55000088";
+// const night_color = "#00005588";
+
 // HTML Tags
 const time_tag     = document.getElementById("time");
 const location_tag = document.getElementById("location");
@@ -90,13 +94,7 @@ function add_time(time, name) {
     if (tag == null) {
         tag = document.createElement(name);
     }
-
-    // console.log("now:", name === "now")
-    // console.log(pretty_day(time))
-    // console.log(pretty_day(today))
-    // console.log("Not Equal:", pretty_day(time) !== pretty_day(today))
-    
-    
+   
     if (name === "now" && pretty_day(time) !== pretty_day(today)) {
         tag.style.display = "none";
     } else {
@@ -135,8 +133,8 @@ function update(here, now) {
     var sunset_angle  = get_angle(times.sunset);
     if ((times.sunset - times.sunrise) > (day_ms / 2)) {
         // Longer Day
-        gradient = `linear-gradient(${sunrise_angle}rad, ${night_color} 50%, ${transparent} 50%),
-                    linear-gradient(${sunset_angle}rad, ${transparent} 50%, ${day_color} 50%)`;
+        gradient = `linear-gradient(${sunrise_angle}rad, ${transparent} 50%, ${day_color} 50%),
+                    linear-gradient(${sunset_angle}rad, ${transparent} 50%, ${night_color} 50%)`;
     } else {
         // Longer Night
         gradient = `linear-gradient(${sunrise_angle}rad, ${night_color} 50%, ${transparent} 50%), 
@@ -147,7 +145,8 @@ function update(here, now) {
     // Add Times
     add_time(now, 'now');
     add_time(times.solarNoon, 'solarnoon');
-    add_time(times.nadir, 'nadir');
+    // Tomorrow's nadir for good Daylight Savings behaviour
+    add_time(new Date(times.nadir.getTime() + day_ms), 'nadir');
 
     console.log("Updated", pretty_day(now), pretty_time(now));
 }
@@ -175,6 +174,7 @@ window.onload = () => {
         location.innerHTML = pretty_location(here);
     }
 
+    // Click Listeners
     addListeners(document.getElementById('previous_day'), 'click', () => {
         day_move -= 1;
         var now = new Date(Date.now() + (day_move * day_ms));
@@ -182,6 +182,11 @@ window.onload = () => {
     })
     addListeners(document.getElementById('next_day'), 'click', () => {
         day_move += 1;
+        var now = new Date(Date.now() + (day_move * day_ms));
+        update(here, now);
+    })
+    addListeners(document.getElementById('time'), 'click', () => {
+        day_move = 0;
         var now = new Date(Date.now() + (day_move * day_ms));
         update(here, now);
     })
