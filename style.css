@@ -16,8 +16,8 @@ html, body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-evenly;
-    width: 100%;
+    justify-content: space-between;
+    width: 75%;
 }
 
 #top * {
@@ -27,11 +27,10 @@ html, body {
 
 #time {
     text-align: center;
-    width: 40%
 }
 
 day {
-    border: 5px solid white;
+    border: 2px solid white;
     width:  75vmin;
     height: 75vmin;
     border-radius: 50%;

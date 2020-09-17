@@ -8,7 +8,7 @@ const day_ms = 24*60*60*1000;
 const day_color   = "#3E465C";
 const night_color = "#222222";
 const transparent = "transparent";
-const line_width  = 4;
+const line_width  = 2;
 
 // Debug Styles
 // const day_color   = "#55000088";
@@ -69,7 +69,6 @@ function add_hours(num_hours) {
         hour_tag.id = "hour_" + i;
         day_tag.appendChild(hour_tag);
     }
-    day_tag.style.borderWidth = line_width+"px";
 }
 
 function get_sun_times(here, now) {
@@ -155,6 +154,7 @@ function update(here, now) {
 window.onload = () => {
     // Set Styles
     add_hours(24);
+    day_tag.style.borderWidth = line_width+"px";
     day_tag.style.backgroundColor = day_color;
 
     // Time
