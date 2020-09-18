@@ -54,6 +54,7 @@ function pretty_location(location) {
     return `${Math.round(location.coords.latitude*100)/100}, ${Math.round(location.coords.longitude*100)/100}`
 }
 
+// Add to UI
 function add_hours(num_hours) {   
     var dp = 1000;
     var rot_segment = 2*Math.PI / num_hours;
@@ -69,20 +70,6 @@ function add_hours(num_hours) {
         hour_tag.id = "hour_" + i;
         day_tag.appendChild(hour_tag);
     }
-}
-
-function get_sun_times(here, now) {
-    return SunCalc.getTimes(now, here.coords.latitude, here.coords.longitude);
-}
-
-function get_angle(date) {
-    var ms = date.getHours()*60*60*1000;
-    ms += date.getMinutes()*60*1000;
-    ms += date.getSeconds()*1000;
-    ms += date.getMilliseconds();
-
-    var circle_percent = ms/day_ms;
-    return (circle_percent * 2*Math.PI) - Math.PI/2;
 }
 
 function add_time(time, name) {
@@ -116,10 +103,75 @@ function add_time(time, name) {
     }
 }
 
+// Maths
+function get_sun_times(here, now) {
+    return SunCalc.getTimes(now, here.coords.latitude, here.coords.longitude);
+}
+
+function get_angle(date) {
+    var ms = date.getHours()*60*60*1000;
+    ms += date.getMinutes()*60*1000;
+    ms += date.getSeconds()*1000;
+    ms += date.getMilliseconds();
+
+    var circle_percent = ms/day_ms;
+    return (circle_percent * 2*Math.PI) - Math.PI/2;
+}
+
+// Listeners
+function add_listeners(here, day_move) {
+    // Click Listeners
+    addListeners(document.getElementById('time'), 'click', () => {
+        day_move = 0;
+        var now = new Date();
+        update(here, now);
+    });
+    addListeners(document.getElementById('previous_day'), 'click', () => {
+        day_move -= 1;
+        var now = new Date(Date.now() + (day_move*day_ms));
+        update(here, now);
+    });
+    addListeners(document.getElementById('next_day'), 'click', () => {
+        day_move += 1;
+        var now = new Date(Date.now() + (day_move*day_ms));
+        update(here, now);
+    });
+
+    // Hold Listeners
+    var backward_interval = '';
+    addListeners(document.getElementById('fast_backward'), 'mousedown', (e) => {
+        backward_interval = setInterval(() => {
+            day_move += 1;
+            var now = new Date(Date.now() + (day_move*day_ms));
+            update(here, now);
+        }, 20);
+    });
+    addListeners(document.getElementById('fast_backward'), 'mouseleave mouseup', (e) => {
+        clearInterval(backward_interval);
+    });
+
+    var forward_interval = '';
+    addListeners(document.getElementById('fast_forward'), 'mousedown', (e) => {
+        forward_interval = setInterval(() => {
+            day_move += 1;
+            var now = new Date(Date.now() + (day_move*day_ms));
+            update(here, now);
+        }, 20);
+    });
+    addListeners(document.getElementById('fast_forward'), 'mouseleave mouseup', (e) => {
+        clearInterval(forward_interval);
+    });
+}
+
+
 function update(here, now) {
 
+    if (here == null || now == null) {
+        return;
+    }
+
     var times = get_sun_times(here, now);
-    console.log(times);
+    // console.log(times);
 
     // Set Values
     time_tag.innerHTML     = pretty_day(now);
@@ -147,7 +199,7 @@ function update(here, now) {
     // Tomorrow's nadir for good Daylight Savings behaviour
     add_time(new Date(times.nadir.getTime() + day_ms), 'nadir');
 
-    console.log("Updated", pretty_day(now), pretty_time(now));
+    // console.log("Updated", pretty_day(now), pretty_time(now));
 }
 
 
@@ -159,7 +211,7 @@ window.onload = () => {
 
     // Time
     var day_move = 0;
-    var now = new Date(Date.now() + (day_move * day_ms));
+    var now = new Date(Date.now() + (day_move*day_ms));
     add_time(now, 'now');
 
     // Location
@@ -168,32 +220,18 @@ window.onload = () => {
         navigator.geolocation.getCurrentPosition((position) => {
             here = position;
             update(here, now);
+            add_listeners(here, day_move);
         });
     } else {
         here = "Your browser is too old to share your location :'(";
         location.innerHTML = pretty_location(here);
     }
 
-    // Click Listeners
-    addListeners(document.getElementById('previous_day'), 'click', () => {
-        day_move -= 1;
-        var now = new Date(Date.now() + (day_move * day_ms));
-        update(here, now);
-    })
-    addListeners(document.getElementById('next_day'), 'click', () => {
-        day_move += 1;
-        var now = new Date(Date.now() + (day_move * day_ms));
-        update(here, now);
-    })
-    addListeners(document.getElementById('time'), 'click', () => {
-        day_move = 0;
-        var now = new Date(Date.now() + (day_move * day_ms));
-        update(here, now);
-    })
+    
 
     // Update
     setInterval(() => {
-        var now = new Date(Date.now() + (day_move * day_ms));
+        var now = new Date(Date.now() + (day_move*day_ms));
         update(here, now)
     }, 30*1000);
 }
