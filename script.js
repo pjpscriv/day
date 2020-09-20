@@ -139,26 +139,26 @@ function add_listeners(here, day_move) {
 
     // Hold Listeners
     var backward_interval = '';
-    addListeners(document.getElementById('fast_backward'), 'mousedown', (e) => {
+    addListeners(document.getElementById('fast_backward'), 'mousedown touchstart', (e) => {
         backward_interval = setInterval(() => {
             day_move += 1;
             var now = new Date(Date.now() + (day_move*day_ms));
             update(here, now);
         }, 20);
     });
-    addListeners(document.getElementById('fast_backward'), 'mouseleave mouseup', (e) => {
+    addListeners(document.getElementById('fast_backward'), 'mouseleave mouseup touchend', (e) => {
         clearInterval(backward_interval);
     });
 
     var forward_interval = '';
-    addListeners(document.getElementById('fast_forward'), 'mousedown', (e) => {
+    addListeners(document.getElementById('fast_forward'), 'mousedown touchstart', (e) => {
         forward_interval = setInterval(() => {
             day_move += 1;
             var now = new Date(Date.now() + (day_move*day_ms));
             update(here, now);
         }, 20);
     });
-    addListeners(document.getElementById('fast_forward'), 'mouseleave mouseup', (e) => {
+    addListeners(document.getElementById('fast_forward'), 'mouseleave mouseup touchend', (e) => {
         clearInterval(forward_interval);
     });
 }
@@ -226,8 +226,6 @@ window.onload = () => {
         here = "Your browser is too old to share your location :'(";
         location.innerHTML = pretty_location(here);
     }
-
-    
 
     // Update
     setInterval(() => {
