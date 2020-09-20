@@ -16,8 +16,8 @@ html, body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    width: 75%;
+    justify-content: space-evenly;
+    width: 80%;
 }
 
 #top * {
@@ -26,6 +26,7 @@ html, body {
 }
 
 #time {
+    width: 65%;
     text-align: center;
 }
 
