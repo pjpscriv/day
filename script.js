@@ -21,6 +21,11 @@ const sunrise_tag  = document.getElementById("sunrise");
 const sunset_tag   = document.getElementById("sunset");
 const day_tag      = document.getElementById("day");
 
+// Globals
+var here = null;
+var now = new Date();
+var day_move = 0;
+
 // Helper
 function addListeners(element, events, fn) {
     events.split(' ').forEach(e => element.addEventListener(e, fn, false));
@@ -119,22 +124,50 @@ function get_angle(date) {
 }
 
 // Listeners
-function add_listeners(here, day_move) {
+function add_listeners(day_move) {
     // Click Listeners
     addListeners(document.getElementById('time'), 'click', () => {
         day_move = 0;
-        var now = new Date();
-        update(here, now);
+        update_ui(here, day_move);
     });
     addListeners(document.getElementById('previous_day'), 'click', () => {
         day_move -= 1;
-        var now = new Date(Date.now() + (day_move*day_ms));
-        update(here, now);
+        update_ui(here, day_move);
     });
     addListeners(document.getElementById('next_day'), 'click', () => {
         day_move += 1;
+        update_ui(here, day_move);
+    });
+
+    addListeners(document.getElementById('lat_up'), 'click', () => {
+        here = {
+            coords: {
+                latitude: Math.min(here.coords.latitude + 1, 90),
+                longitude: here.coords.longitude
+            }
+        }
+        update_ui(here, day_move)
+    });
+    addListeners(document.getElementById('lat_down'), 'click', () => {
+        here = {
+            coords: {
+                latitude: Math.max(here.coords.latitude - 1, -90),
+                longitude: here.coords.longitude
+            }
+        }
         var now = new Date(Date.now() + (day_move*day_ms));
-        update(here, now);
+        update_ui(here, day_move)
+    });
+    addListeners(document.getElementById('location'), 'click', () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                here = position;
+                update_ui(here, day_move);
+            });
+        } else {
+            here = "Your browser is too old to share your location :'(";
+            location_tag.innerHTML = here;
+        }
     });
 
     // Hold Listeners
@@ -142,8 +175,7 @@ function add_listeners(here, day_move) {
     addListeners(document.getElementById('fast_backward'), 'mousedown touchstart', (e) => {
         backward_interval = setInterval(() => {
             day_move += 1;
-            var now = new Date(Date.now() + (day_move*day_ms));
-            update(here, now);
+            update_ui(here, day_move);
         }, 20);
     });
     addListeners(document.getElementById('fast_backward'), 'mouseleave mouseup touchend', (e) => {
@@ -154,8 +186,7 @@ function add_listeners(here, day_move) {
     addListeners(document.getElementById('fast_forward'), 'mousedown touchstart', (e) => {
         forward_interval = setInterval(() => {
             day_move += 1;
-            var now = new Date(Date.now() + (day_move*day_ms));
-            update(here, now);
+            update_ui(here, day_move);
         }, 20);
     });
     addListeners(document.getElementById('fast_forward'), 'mouseleave mouseup touchend', (e) => {
@@ -164,12 +195,13 @@ function add_listeners(here, day_move) {
 }
 
 
-function update(here, now) {
+function update_ui(here, day_move) {
 
-    if (here == null || now == null) {
+    if (here == null || day_move == null) {
         return;
     }
 
+    now = new Date(Date.now() + (day_move*day_ms));
     var times = get_sun_times(here, now);
     // console.log(times);
 
@@ -209,27 +241,24 @@ window.onload = () => {
     day_tag.style.borderWidth = line_width+"px";
     day_tag.style.backgroundColor = day_color;
 
+    // Listeners
+    add_listeners(day_move);
+
     // Time
-    var day_move = 0;
-    var now = new Date(Date.now() + (day_move*day_ms));
+    now = new Date(Date.now() + (day_move*day_ms));
     add_time(now, 'now');
 
     // Location
-    var here = null;
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
             here = position;
-            update(here, now);
-            add_listeners(here, day_move);
+            update_ui(here, day_move);
         });
     } else {
         here = "Your browser is too old to share your location :'(";
-        location.innerHTML = pretty_location(here);
+        location_tag.innerHTML = here;
     }
 
-    // Update
-    setInterval(() => {
-        var now = new Date(Date.now() + (day_move*day_ms));
-        update(here, now)
-    }, 30*1000);
+    // Update each minute
+    setInterval(() => { update_ui(here, day_move) }, 60*1000);
 }
