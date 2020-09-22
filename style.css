@@ -2,8 +2,8 @@ html, body {
     margin: 0;
     width: 100%;
     height: 100%;
-    color: white;
-    background-color: #3E465C;
+    /* color: white; */
+    /* background-color: #444444; */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -42,7 +42,7 @@ day {
     align-items: center;
 
     /* opacity: .5; */
-    background-image: linear-gradient(0rad, #222222 50%, transparent 50%);
+    /* background-image: linear-gradient(0rad, #222222 50%, transparent 50%); */
 }
 
 hour {
@@ -52,23 +52,20 @@ hour {
     height: 2vmin;
 }
 
-now {
-    background-color: tomato;
+.time {
     position: absolute;
     width: 5px;
     height: 6vmin;
+}
+
+now {
+    background-color: tomato;
 }
 
 solarnoon {
     background-color: gold;
-    position: absolute;
-    width: 5px;
-    height: 6vmin;
 }
 
 nadir {
     background-color: #eeeeee;
-    position: absolute;
-    width: 5px;
-    height: 6vmin;
 }

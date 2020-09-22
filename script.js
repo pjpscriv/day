@@ -5,16 +5,22 @@
 const day_ms = 24*60*60*1000;
 
 // Styles
-const day_color   = "#3E465C";
-const night_color = "#222222";
+// const day_color   = "#317bea";
+const day_color   = "rgb(149, 191, 255)";
+const night_color = "rgb(46, 73, 216)";
+
 const transparent = "transparent";
-const line_width  = 2;
+const line_width  = 4;
+
+const bg_color    = day_color;
+const font_color  = "black"; // also border & hour
 
 // Debug Styles
 // const day_color   = "#55000088";
 // const night_color = "#00005588";
 
 // HTML Tags
+const body_tag     = document.getElementsByTagName('body')[0];
 const time_tag     = document.getElementById("time");
 const location_tag = document.getElementById("location");
 const sunrise_tag  = document.getElementById("sunrise");
@@ -72,6 +78,7 @@ function add_hours(num_hours) {
         var hour_tag = document.createElement('hour');
         hour_tag.style.transform = `translate(${y}vmin, ${x}vmin) rotate(${rotation}rad)`;
         hour_tag.style.width = line_width+"px";
+        hour_tag.style.backgroundColor = font_color;
         hour_tag.id = "hour_" + i;
         day_tag.appendChild(hour_tag);
     }
@@ -103,6 +110,7 @@ function add_time(time, name) {
         tag.style.display = "block"
         tag.style.transform = `translate(${y}vmin, ${x}vmin) rotate(${rotation}rad)`;
         tag.style.width = line_width+"px";
+        tag.className = "time";
         tag.id = name;
         day_tag.appendChild(tag);
     }
@@ -124,19 +132,19 @@ function get_angle(date) {
 }
 
 // Listeners
-function add_listeners(day_move) {
+function add_listeners() {
     // Click Listeners
     addListeners(document.getElementById('time'), 'click', () => {
         day_move = 0;
-        update_ui(here, day_move);
+        update_ui();
     });
     addListeners(document.getElementById('previous_day'), 'click', () => {
         day_move -= 1;
-        update_ui(here, day_move);
+        update_ui();
     });
     addListeners(document.getElementById('next_day'), 'click', () => {
         day_move += 1;
-        update_ui(here, day_move);
+        update_ui();
     });
 
     addListeners(document.getElementById('lat_up'), 'click', () => {
@@ -146,7 +154,7 @@ function add_listeners(day_move) {
                 longitude: here.coords.longitude
             }
         }
-        update_ui(here, day_move)
+        update_ui()
     });
     addListeners(document.getElementById('lat_down'), 'click', () => {
         here = {
@@ -155,14 +163,13 @@ function add_listeners(day_move) {
                 longitude: here.coords.longitude
             }
         }
-        var now = new Date(Date.now() + (day_move*day_ms));
-        update_ui(here, day_move)
+        update_ui()
     });
     addListeners(document.getElementById('location'), 'click', () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
                 here = position;
-                update_ui(here, day_move);
+                update_ui();
             });
         } else {
             here = "Your browser is too old to share your location :'(";
@@ -174,8 +181,8 @@ function add_listeners(day_move) {
     var backward_interval = '';
     addListeners(document.getElementById('fast_backward'), 'mousedown touchstart', (e) => {
         backward_interval = setInterval(() => {
-            day_move += 1;
-            update_ui(here, day_move);
+            day_move -= 1;
+            update_ui();
         }, 20);
     });
     addListeners(document.getElementById('fast_backward'), 'mouseleave mouseup touchend', (e) => {
@@ -186,7 +193,7 @@ function add_listeners(day_move) {
     addListeners(document.getElementById('fast_forward'), 'mousedown touchstart', (e) => {
         forward_interval = setInterval(() => {
             day_move += 1;
-            update_ui(here, day_move);
+            update_ui();
         }, 20);
     });
     addListeners(document.getElementById('fast_forward'), 'mouseleave mouseup touchend', (e) => {
@@ -195,7 +202,7 @@ function add_listeners(day_move) {
 }
 
 
-function update_ui(here, day_move) {
+function update_ui() {
 
     if (here == null || day_move == null) {
         return;
@@ -208,41 +215,58 @@ function update_ui(here, day_move) {
     // Set Values
     time_tag.innerHTML     = pretty_day(now);
     location_tag.innerHTML = pretty_location(here);
-    sunrise_tag.innerHTML  = pretty_time(times.sunrise);
-    sunset_tag.innerHTML   = pretty_time(times.sunset);
+    var gradient;
 
-    // Set Gradients
-    var sunrise_angle = get_angle(times.sunrise);
-    var sunset_angle  = get_angle(times.sunset);
-    if ((times.sunset - times.sunrise) > (day_ms / 2)) {
-        // Longer Day
-        gradient = `linear-gradient(${sunrise_angle}rad, ${transparent} 50%, ${day_color} 50%),
-                    linear-gradient(${sunset_angle}rad, ${transparent} 50%, ${night_color} 50%)`;
+    // Check day has sunrise & sunset
+    if (!isNaN(times.sunrise) && !isNaN(times.sunset)) {
+        sunrise_tag.innerHTML  = pretty_time(times.sunrise);
+        sunset_tag.innerHTML   = pretty_time(times.sunset);
+
+        // Set Gradients
+        var sunrise_angle = get_angle(times.sunrise);
+        var sunset_angle  = get_angle(times.sunset);
+        if ((times.sunset - times.sunrise) > (day_ms / 2)) {
+            // Longer Day
+            gradient = `linear-gradient(${sunrise_angle}rad, ${transparent} 50%, ${day_color} 50%),
+                        linear-gradient(${sunset_angle}rad, ${transparent} 50%, ${night_color} 50%)`;
+        } else {
+            // Longer Night
+            gradient = `linear-gradient(${sunrise_angle}rad, ${night_color} 50%, ${transparent} 50%), 
+                        linear-gradient(${sunset_angle}rad, ${transparent} 50%, ${night_color} 50%)`
+        }
     } else {
-        // Longer Night
-        gradient = `linear-gradient(${sunrise_angle}rad, ${night_color} 50%, ${transparent} 50%), 
-                    linear-gradient(${sunset_angle}rad, ${transparent} 50%, ${night_color} 50%)`
+        sunrise_tag.innerHTML = "No Sunrise";
+        sunset_tag.innerHTML = "No Sunset";
+
+        // Hack - should be a better way of doing this
+        if (isNaN(times.night)) {
+            gradient = `linear-gradient(0rad, ${day_color} 50%, ${day_color} 50%)`;
+        } else {
+            gradient = `linear-gradient(0rad, ${night_color} 50%, ${night_color} 50%)`;
+        }    
     }
     day_tag.style.backgroundImage = gradient;
-
     // Add Times
     add_time(now, 'now');
     add_time(times.solarNoon, 'solarnoon');
-    // Tomorrow's nadir for good Daylight Savings behaviour
+    // Tomorrow's nadir for nice Daylight Savings behaviour
     add_time(new Date(times.nadir.getTime() + day_ms), 'nadir');
 
-    // console.log("Updated", pretty_day(now), pretty_time(now));
+    console.log("Updated", pretty_day(now), pretty_time(now));
 }
 
 
 window.onload = () => {
     // Set Styles
     add_hours(24);
+    body_tag.style.color = font_color;
+    body_tag.style.backgroundColor = bg_color;
     day_tag.style.borderWidth = line_width+"px";
+    day_tag.style.borderColor = font_color;
     day_tag.style.backgroundColor = day_color;
 
     // Listeners
-    add_listeners(day_move);
+    add_listeners();
 
     // Time
     now = new Date(Date.now() + (day_move*day_ms));
@@ -252,7 +276,7 @@ window.onload = () => {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
             here = position;
-            update_ui(here, day_move);
+            update_ui();
         });
     } else {
         here = "Your browser is too old to share your location :'(";
@@ -260,5 +284,5 @@ window.onload = () => {
     }
 
     // Update each minute
-    setInterval(() => { update_ui(here, day_move) }, 60*1000);
+    // setInterval(() => { update_ui() }, 10*1000);
 }
