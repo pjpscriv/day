@@ -6,14 +6,20 @@ const day_ms = 24*60*60*1000;
 
 // Styles
 // const day_color   = "#317bea";
-const day_color   = "rgb(149, 191, 255)";
-const night_color = "rgb(46, 73, 216)";
-
 const transparent = "transparent";
 const line_width  = 4;
 
-const bg_color    = day_color;
-const font_color  = "black"; // also border & hour
+// Day Colors
+// const day_color   = "rgb(149, 191, 255)";
+// const night_color = "rgb(46, 73, 216)";
+// const bg_color    = day_color;
+// const font_color  = "black"; // also border & hour
+
+// Night Colors
+const day_color   = "rgb(62, 88, 128)";
+const night_color = "#222222";
+const bg_color    = night_color;
+const font_color  = "white"; // also border & hour
 
 // Debug Styles
 // const day_color   = "#55000088";
