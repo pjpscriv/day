@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Day</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+  <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+  <div id="top">
+    <span id="fast_backward" class="material-icons">fast_rewind</span>
+    <span id="previous_day" class="material-icons">navigate_before</span>
+    <p id="time">Now</p>
+    <span id="next_day" class="material-icons">navigate_next</span>
+    <span id="fast_forward" class="material-icons">fast_forward</span>
+  </div>
+
+  <day id="day">
+    <p id="sunrise">Sunrise</p>
+    <p id="sunset">Sunset</p>
+  </day>
+
+  <div id="top">
+    <span id="lat_down" class="material-icons">remove</span>
+    <p id="location">Here</p>
+    <span id="lat_up" class="material-icons">add</span>
+  </div>
+
+  <script src="suncalc.js" async defer></script>
+  <script src="script.js" async defer></script>
+</body>
+
+</html>
