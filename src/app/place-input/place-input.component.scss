@@ -17,6 +17,10 @@ place-input:host * {
 
 .custom-input-container {
   min-width: 80%;
-  justify-content: center;
+  justify-content: space-evenly;
   display: flex;
+}
+
+.name-input {
+  min-width: 60%;
 }

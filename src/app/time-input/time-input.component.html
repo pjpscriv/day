@@ -1,19 +1,29 @@
-<!-- <span id="fast_backward" class="material-icons">fast_rewind</span>
-<span id="previous_day" class="material-icons">navigate_before</span> -->
-
-<button mat-button mat-mini-fab color="primary"><mat-icon>fast_rewind</mat-icon></button>
-<button mat-button mat-mini-fab><mat-icon>navigate_before</mat-icon></button>
+<button mat-button mat-mini-fab color="primary"
+  (mousedown)="startFastBackwards()"
+  (mouseup)="endFastBackwards()">
+  <mat-icon>fast_rewind</mat-icon>
+</button>
+<button mat-button mat-mini-fab (click)="previousDay()">
+  <mat-icon>navigate_before</mat-icon>
+</button>
 
 <mat-form-field appearance="outline">
   <mat-label>When</mat-label>
-  <input matInput [matDatepicker]="picker" (dateChange)="onDateChange($event)" (focus)="picker.open()">
+  <input matInput
+    [matDatepicker]="picker"
+    [value]="time"
+    (dateChange)="onDateChange($event)"
+    (focus)="picker.open()">
   <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
   <mat-datepicker #picker></mat-datepicker>
 </mat-form-field>
 
-<button mat-button mat-mini-fab><mat-icon>navigate_next</mat-icon></button>
-<button mat-button mat-mini-fab color="primary"><mat-icon>fast_forward</mat-icon></button>
-
-<!-- <span id="next_day" class="material-icons">navigate_next</span> -->
-<!-- <span id="fast_forward" class="material-icons">fast_forward</span> -->
+<button mat-button mat-mini-fab (click)="nextDay()">
+  <mat-icon>navigate_next</mat-icon>
+</button>
+<button mat-button mat-mini-fab color="primary"
+  (mousedown)="startFastForwards()"
+  (mouseup)="endFastForwards()">
+  <mat-icon>fast_forward</mat-icon>
+</button>

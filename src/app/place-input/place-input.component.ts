@@ -1,6 +1,6 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { map, Observable, Subject } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Place, Wellington } from '../types/place.type';
 
 
@@ -11,7 +11,6 @@ import { Place, Wellington } from '../types/place.type';
 })
 export class PlaceInputComponent implements OnInit {
   public place: Place;
-  @Output() public placeChange = new EventEmitter();
   public value: string = '';
   public autocompletePlaces$ = new Observable<any[]>();
   public showLatLongInput = false;
@@ -19,6 +18,7 @@ export class PlaceInputComponent implements OnInit {
 
   constructor() {
     this.place = Wellington;
+    this.textInputFormControl.setValue(this.place.name);
   }
 
   ngOnInit(): void {
@@ -27,10 +27,28 @@ export class PlaceInputComponent implements OnInit {
         return ['A', 'Set', 'Of', 'Test', 'Values'].slice(value.length)
       })
     )
+
+    // Location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log(position);
+          this.place = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            name: 'Your location'
+          }
+        },
+        (_) => {
+          console.log('Position not given');
+        }
+      );
+    } else {
+        console.log("Your browser is too old to share your location :'(");
+    }
   }
 
   public toggleInputType(): void {
     this.showLatLongInput = !this.showLatLongInput;
   }
-
 }

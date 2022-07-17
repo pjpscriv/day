@@ -3,7 +3,11 @@ time-input:host {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 80%;
+  width: 95%;
+
+  @media screen and (min-width: 700px) {
+    width: 80%;
+  }
 }
 
 time-input:host * {

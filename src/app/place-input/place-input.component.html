@@ -1,6 +1,3 @@
-<!-- <span id="lat_down" class="material-icons">remove</span> -->
-
-
 <mat-icon *ngIf="showLatLongInput">pin_drop</mat-icon>
 <mat-icon *ngIf="!showLatLongInput">text_fields</mat-icon>
 
@@ -8,34 +5,39 @@
   <ng-container *ngIf="showLatLongInput; else nameInput">
     <mat-form-field appearance="outline">
       <mat-label>Lat</mat-label>
-      <input matInput type="number">
+      <input
+        matInput
+        type="number"
+        [value]="place.latitude">
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Long</mat-label>
-      <input matInput type="number">
+      <input
+        matInput
+        type="number"
+        [value]="place.longitude">
     </mat-form-field>
   </ng-container>
 
   <ng-template #nameInput>
-  <mat-form-field appearance="outline">
-    <mat-label>Where</mat-label>
-    <input
-      matInput
-      type="text"
-      [matAutocomplete]="auto"
-      [formControl]="textInputFormControl">
-    <!-- <mat-icon matSuffix>pin_drop</mat-icon> -->
-    <mat-autocomplete #auto="matAutocomplete">
-      <mat-option *ngFor="let option of autocompletePlaces$ | async" [value]="option">
-        {{ option }}
-      </mat-option>
-    </mat-autocomplete>
-  </mat-form-field>
+    <mat-form-field class="name-input" appearance="outline">
+      <mat-label>Where</mat-label>
+      <input
+        matInput
+        type="text"
+        [value]="place.name"
+        [matAutocomplete]="auto"
+        [formControl]="textInputFormControl">
+      <!-- <mat-icon matSuffix>pin_drop</mat-icon> -->
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option *ngFor="let option of autocompletePlaces$ | async" [value]="option">
+          {{ option }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
   </ng-template>
 </div>
 
 <button mat-button mat-mini-fab color="primary" (click)="toggleInputType()">
   <mat-icon>cached</mat-icon>
 </button>
-
-<!-- <span id="lat_up" class="material-icons">add</span> -->
