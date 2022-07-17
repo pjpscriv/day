@@ -2,7 +2,7 @@ time-input:host {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-between;
   width: 80%;
 }
 
@@ -14,4 +14,8 @@ time-input:host * {
 #time {
   width: 65%;
   text-align: center;
+}
+
+::ng-deep .mat-form-field .mat-form-field-wrapper {
+  padding-bottom: 0;
 }

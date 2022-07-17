@@ -1,17 +1,16 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
 @Component({
   selector: 'time-input',
   templateUrl: './time-input.component.html',
-  styleUrls: ['./time-input.component.css']
+  styleUrls: ['./time-input.component.scss']
 })
-export class TimeInputComponent implements OnInit {
-  @Input() public time = new Date();
-  @Output() public timeChange = new EventEmitter();
+export class TimeInputComponent {
+  public time = new Date();
+  // @Output() public timeChange = new EventEmitter();
 
-  constructor() { }
-
-  ngOnInit(): void {
+  public onDateChange(event: MatDatepickerInputEvent<any, any>): void {
+    this.time = event.value;
   }
-
 }

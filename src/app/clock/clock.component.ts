@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, ViewContainerRef } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Place, Wellington } from '../types/place.type';
 
 declare var SunCalc: any;
 const day_ms = 24*60*60*1000;
@@ -9,16 +10,17 @@ const line_width  = 4;
 @Component({
   selector: 'clock',
   templateUrl: './clock.component.html',
-  styleUrls: ['./clock.component.css']
+  styleUrls: ['./clock.component.scss']
 })
 export class ClockComponent implements OnInit {
   // @ViewContainerRef('clock') hostRef: any;
-  @Input() public time = new Date();
-  @Input() public place: any = null;
+  @Input() public time: Date;
+  @Input() public place: Place;
   public hours = Array(NUMBER_OF_HOURS).fill(0).map((_, i) => i);
 
   constructor() {
-    // new SunCalc();
+    this.time = new Date();
+    this.place = Wellington;
   }
 
   ngOnInit(): void {

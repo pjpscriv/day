@@ -3,11 +3,11 @@ import { Component, OnInit } from '@angular/core';
 @Component({
   selector: 'root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  public time = new Date();
-  public place: any;
+  // public time = new Date();
+  // public place: any;
 
   constructor() {
   }
@@ -21,9 +21,9 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(p => this.place = p);
-    }
-    console.log('start!')
+    // if (navigator.geolocation) {
+    //   navigator.geolocation.getCurrentPosition(p => this.place = p);
+    // }
+    // console.log('start!')
   }
 }

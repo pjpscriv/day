@@ -1,9 +1,5 @@
-<time-input
-    [time]="time"
-    (timeChange)="timeChanged($event)"></time-input>
+<time-input #timePicker></time-input>
 <clock
-    [time]="time"
-    [place]="place"></clock>
-<place-input
-    [place]="place"
-    (placeChange)="placeChanged($event)"></place-input>
+    [time]="timePicker.time"
+    [place]="placePicker.place"></clock>
+<place-input #placePicker></place-input>
