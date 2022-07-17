@@ -1,0 +1,17 @@
+time-input:host {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 80%;
+}
+
+time-input:host * {
+  cursor: pointer;
+  user-select: none;
+}
+
+#time {
+  width: 65%;
+  text-align: center;
+}
