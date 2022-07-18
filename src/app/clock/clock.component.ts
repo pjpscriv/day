@@ -89,7 +89,6 @@ export class ClockComponent implements OnChanges {
   }
 
   public getPosition(name: string, hour?: number): any {
-    if (!this.sunTimes) return
     const dp = 1000;
     let rotation = 0;
     switch (name) {
@@ -97,13 +96,13 @@ export class ClockComponent implements OnChanges {
         rotation = (hour ?? 0) * 2 * Math.PI / NUMBER_OF_HOURS;
         break;
       case 'nadir':
-        rotation = this.getRotation(this.sunTimes.nadir); // TODO: Maybe adapt here?
+        rotation = !!this.sunTimes ? this.getRotation(this.sunTimes.nadir) : 0; // TODO: Maybe adapt here?
         break;
       case 'solarnoon':
-        rotation = this.getRotation(this.sunTimes.solarNoon);
+        rotation = !!this.sunTimes ? this.getRotation(this.sunTimes.solarNoon) : Math.PI;
         break;
       case 'now':
-        rotation = this.getRotation(this.time);
+        rotation = !!this.sunTimes ? this.getRotation(this.time) : 0;
         break;
     }
     const y = Math.round((Math.sin(rotation) * 36.6) * dp) / dp * -1;
