@@ -1,21 +1,23 @@
 <mat-icon *ngIf="showLatLongInput">pin_drop</mat-icon>
-<mat-icon *ngIf="!showLatLongInput">text_fields</mat-icon>
+<mat-icon *ngIf="!showLatLongInput">signpost</mat-icon>
 
 <div class="custom-input-container">
   <ng-container *ngIf="showLatLongInput; else nameInput">
     <mat-form-field appearance="outline">
       <mat-label>Lat</mat-label>
-      <input
+      <input min="-90" max="90"
         matInput
         type="number"
-        [value]="place.latitude">
+        [value]="place.latitude"
+        (change)="onLatChange($event)">
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Long</mat-label>
-      <input
+      <input min="-180" max="180"
         matInput
         type="number"
-        [value]="place.longitude">
+        [value]="place.longitude"
+        (change)="onLongChange($event)">
     </mat-form-field>
   </ng-container>
 

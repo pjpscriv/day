@@ -7,6 +7,9 @@ import { Place, Wellington } from '../types/place.type';
 declare var SunCalc: any;
 const font_color  = "white";
 const line_width  = 4;
+const DAY_COLOR   = "rgb(62, 88, 128)";
+const NIGHT_COLOR = "#222222";
+const TRANSPARENT = "transparent";
 
 @Component({
   selector: 'clock',
@@ -15,7 +18,7 @@ const line_width  = 4;
 })
 export class ClockComponent implements OnChanges {
   @Input() public time: Date;
-  @Input() public place: Place;
+  @Input() public place: Place | null;
   public sunTimes: any;
   public sunrise: string;
   public sunset: string;
@@ -29,6 +32,7 @@ export class ClockComponent implements OnChanges {
     this.place = Wellington;
     this.sunrise = 'Sunrise';
     this.sunset = 'Sunset';
+    this.elRef.nativeElement.style.backgroundColour = DAY_COLOR;
   }
 
 
@@ -41,37 +45,21 @@ export class ClockComponent implements OnChanges {
     if (!this.time || !this.place) return;
 
     this.sunTimes = this.getSunTimes(this.time, this.place);
+    let gradient = `linear-gradient(0rad, ${NIGHT_COLOR} 50%, ${NIGHT_COLOR} 50%)`;
+    let bgColor = NIGHT_COLOR;
 
-    const transparent = "transparent";
-    let gradient;
-    const day_color   = "rgb(62, 88, 128)";
-    const night_color = "#222222";
-
-    // Check day has sunrise & sunset
-    if (!isNaN(this.sunTimes.sunrise) && !isNaN(this.sunTimes.sunset)) {
-
-      // Set Gradients
-      var sunriseAngle = this.getAngle(this.sunTimes.sunrise);
-      var sunsetAngle  = this.getAngle(this.sunTimes.sunset);
-      if ((this.sunTimes.sunset - this.sunTimes.sunrise) > (MS_PER_DAY / 2)) {
-          // Longer Day
-          gradient = `linear-gradient(${sunriseAngle}rad, ${transparent} 50%, ${day_color} 50%),
-                      linear-gradient(${sunsetAngle}rad, ${transparent} 50%, ${night_color} 50%)`;
-      } else {
-          // Longer Night
-          gradient = `linear-gradient(${sunriseAngle}rad, ${night_color} 50%, ${transparent} 50%),
-                      linear-gradient(${sunsetAngle}rad, ${transparent} 50%, ${night_color} 50%)`
-      }
-
+    if (this.hasSunriseAndSunset(this.sunTimes)) {
       this.sunrise = this.datePipe.transform(this.sunTimes.sunrise, 'h:mm a') ?? '';
       this.sunset = this.datePipe.transform(this.sunTimes.sunset, 'h:mm a') ?? '';
 
+      let sunriseAngle = this.getAngle(this.sunTimes.sunrise);
+      let sunsetAngle  = this.getAngle(this.sunTimes.sunset);
+      gradient = this.getGradient(sunriseAngle, sunsetAngle, this.dayLongerThanNight(this.sunTimes));
+      bgColor = this.dayLongerThanNight(this.sunTimes) ? NIGHT_COLOR : DAY_COLOR;
+
     } else {
-      // Hack - should be a better way of doing this
       if (isNaN(this.sunTimes.night)) {
-        gradient = `linear-gradient(0rad, ${day_color} 50%, ${day_color} 50%)`;
-      } else {
-        gradient = `linear-gradient(0rad, ${night_color} 50%, ${night_color} 50%)`;
+        gradient = `linear-gradient(0rad, ${DAY_COLOR} 50%, ${DAY_COLOR} 50%)`;
       }
 
       this.sunrise = 'No Sunrise';
@@ -79,15 +67,29 @@ export class ClockComponent implements OnChanges {
     }
 
     this.elRef.nativeElement.style.backgroundImage = gradient;
-    // Add Times
-    // this.addTime(time, 'now');
-    // this.addTime(this.sunTimes.solarNoon, 'solarnoon');
+    this.elRef.nativeElement.style.backgroundColor = bgColor;
+
     // // Tomorrow's nadir for nice Daylight Savings behaviour
     // this.addTime(new Date(this.sunTimes.nadir.getTime() + MS_PER_DAY), 'nadir');
   }
 
+  public hasSunriseAndSunset(sunTimes: any): boolean {
+    return !isNaN(sunTimes.sunrise) && !isNaN(sunTimes.sunset);
+  }
+
+  public dayLongerThanNight(sunTimes: any): boolean {
+    return (sunTimes.sunset - sunTimes.sunrise) > (MS_PER_DAY / 2);
+  }
+
+  public getGradient(sunriseAngle: any, sunsetAngle: any, isDay: boolean): string {
+    const colour1 = isDay ? TRANSPARENT : NIGHT_COLOR;
+    const colour2 = isDay ? DAY_COLOR : TRANSPARENT;
+    return `linear-gradient(${sunriseAngle}rad, ${colour1} 50%, ${colour2} 50%),
+            linear-gradient(${sunsetAngle}rad, ${colour2} 50%, ${colour1} 50%)`;
+  }
 
   public getPosition(name: string, hour?: number): any {
+    if (!this.sunTimes) return
     const dp = 1000;
     let rotation = 0;
     switch (name) {

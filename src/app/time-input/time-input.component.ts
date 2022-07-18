@@ -9,6 +9,7 @@ import { MS_PER_DAY } from '../day.consts';
 })
 export class TimeInputComponent {
   public time: Date;
+  private repeater: any;
 
   constructor() {
     this.time = new Date();
@@ -28,19 +29,15 @@ export class TimeInputComponent {
     this.time = new Date(this.time.getTime() - MS_PER_DAY);
   }
 
-  public startFastForwards(): void {
-    console.log('Called startFastForwards()');
+  public timeWarpForwards(): void {
+    this.repeater = setInterval(() => this.nextDay(), 20);
   }
 
-  public startFastBackwards(): void {
-    console.log('Called startFastBackwards()');
+  public timeWarpBackwards(): void {
+    this.repeater = setInterval(() => this.previousDay(), 20);
   }
 
-  public endFastForwards(): void {
-    console.log('Called endFastForawrds()');
-  }
-
-  public endFastBackwards(): void {
-    console.log('Called endFastBackwards()');
+  public stopTimeWarp(): void {
+    clearInterval(this.repeater);
   }
 }

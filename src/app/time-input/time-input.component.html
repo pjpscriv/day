@@ -1,9 +1,9 @@
 <button mat-button mat-mini-fab color="primary"
-  (mousedown)="startFastBackwards()"
-  (mouseup)="endFastBackwards()">
+  (mousedown)="timeWarpBackwards()"
+  (mouseup)="stopTimeWarp()">
   <mat-icon>fast_rewind</mat-icon>
 </button>
-<button mat-button mat-mini-fab (click)="previousDay()">
+<button mat-button mat-flat-button (click)="previousDay()">
   <mat-icon>navigate_before</mat-icon>
 </button>
 
@@ -19,11 +19,11 @@
   <mat-datepicker #picker></mat-datepicker>
 </mat-form-field>
 
-<button mat-button mat-mini-fab (click)="nextDay()">
+<button mat-button mat-flat-button (click)="nextDay()">
   <mat-icon>navigate_next</mat-icon>
 </button>
 <button mat-button mat-mini-fab color="primary"
-  (mousedown)="startFastForwards()"
-  (mouseup)="endFastForwards()">
+  (mousedown)="timeWarpForwards()"
+  (mouseup)="stopTimeWarp()">
   <mat-icon>fast_forward</mat-icon>
 </button>
