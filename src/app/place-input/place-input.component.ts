@@ -11,7 +11,7 @@ import { Place, Wellington } from '../types/place.type';
 })
 export class PlaceInputComponent implements OnInit {
   public place: Place;
-  public place$ = new Subject<Place>();
+  public place$: Subject<Place>;
   public value: string = '';
   public autocompletePlaces$ = new Observable<any[]>();
   public showLatLongInput = false;
@@ -19,17 +19,26 @@ export class PlaceInputComponent implements OnInit {
 
   constructor() {
     this.place = Wellington;
-    this.place$.next(Wellington);
+    this.place$ = new Subject<Place>();
     this.textInputFormControl.setValue(this.place.name);
   }
 
   ngOnInit(): void {
+    this.place = this.copyPlace(Wellington);
+    this.place$.next(this.copyPlace(this.place));
+
+    this.setToStartingPosition();
+
     this.autocompletePlaces$ = this.textInputFormControl.valueChanges.pipe(
       map(value => ['A', 'Set', 'Of', 'Test', 'Values'].slice(value.length))
     )
+  }
 
+  public setToStartingPosition(): void {
     if (!navigator.geolocation) {
       console.log("Your browser is too old to share your location :'(");
+      this.place = Wellington;
+      this.place$.next(this.copyPlace(this.place));
       return;
     }
 
@@ -37,8 +46,13 @@ export class PlaceInputComponent implements OnInit {
     navigator.geolocation.getCurrentPosition((position) => {
         console.log(position);
         this.place = { latitude: position.coords.latitude, longitude: position.coords.longitude, name: 'Your location' }
+        this.place$.next(this.copyPlace(this.place));
       },
-      (_) => console.log('Position not given')
+      (error) => {
+        console.log('Position not given', error.message)
+        // this.place = this.copyPlace(Wellington);
+        // this.place$.next(this.copyPlace(this.place));
+      }
     );
   }
 
