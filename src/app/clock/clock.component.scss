@@ -1,0 +1,39 @@
+clock:host {
+  border: 2px solid white;
+  width: 75vmin;
+  height: 75vmin;
+  border-radius: 50%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  /* opacity: .5; */
+  /* background-image: linear-gradient(0rad, #222222 50%, transparent 50%); */
+}
+
+.hour {
+  background-color: white;
+  position: absolute;
+  width: 5px;
+  height: 2vmin;
+}
+
+.time {
+  position: absolute;
+  width: 5px;
+  height: 6vmin;
+}
+
+.now {
+  background-color: tomato;
+}
+
+.solarnoon {
+  background-color: gold;
+}
+
+.nadir {
+  background-color: #eeeeee;
+}

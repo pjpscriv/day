@@ -72,11 +72,11 @@ function pretty_location(location) {
 }
 
 // Add to UI
-function add_hours(num_hours) {   
+function add_hours(num_hours) {
     var dp = 1000;
     var rot_segment = 2*Math.PI / num_hours;
-    
-    for (let i = 0; i < num_hours; i++) {    
+
+    for (let i = 0; i < num_hours; i++) {
         let rotation = (rot_segment * i);
         let y = Math.round((Math.sin(rotation) * 36.6)*dp) / dp * -1;
         let x = Math.round((Math.cos(rotation) * 36.6)*dp) / dp;
@@ -98,7 +98,7 @@ function add_time(time, name) {
     if (tag == null) {
         tag = document.createElement(name);
     }
-   
+
     if (name === "now" && pretty_day(time) !== pretty_day(today)) {
         tag.style.display = "none";
     } else {
@@ -237,7 +237,7 @@ function update_ui() {
                         linear-gradient(${sunset_angle}rad, ${transparent} 50%, ${night_color} 50%)`;
         } else {
             // Longer Night
-            gradient = `linear-gradient(${sunrise_angle}rad, ${night_color} 50%, ${transparent} 50%), 
+            gradient = `linear-gradient(${sunrise_angle}rad, ${night_color} 50%, ${transparent} 50%),
                         linear-gradient(${sunset_angle}rad, ${transparent} 50%, ${night_color} 50%)`
         }
     } else {
@@ -249,7 +249,7 @@ function update_ui() {
             gradient = `linear-gradient(0rad, ${day_color} 50%, ${day_color} 50%)`;
         } else {
             gradient = `linear-gradient(0rad, ${night_color} 50%, ${night_color} 50%)`;
-        }    
+        }
     }
     day_tag.style.backgroundImage = gradient;
     // Add Times

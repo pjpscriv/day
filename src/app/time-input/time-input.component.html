@@ -1,0 +1,29 @@
+<button mat-button mat-mini-fab color="primary"
+  (mousedown)="timeWarpBackwards()"
+  (mouseup)="stopTimeWarp()">
+  <mat-icon>fast_rewind</mat-icon>
+</button>
+<button mat-button mat-flat-button (click)="previousDay()">
+  <mat-icon>navigate_before</mat-icon>
+</button>
+
+<mat-form-field appearance="outline">
+  <mat-label>When</mat-label>
+  <input matInput
+    [matDatepicker]="picker"
+    [value]="time"
+    (dateChange)="onDateChange($event)"
+    (focus)="picker.open()">
+  <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
+  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker #picker></mat-datepicker>
+</mat-form-field>
+
+<button mat-button mat-flat-button (click)="nextDay()">
+  <mat-icon>navigate_next</mat-icon>
+</button>
+<button mat-button mat-mini-fab color="primary"
+  (mousedown)="timeWarpForwards()"
+  (mouseup)="stopTimeWarp()">
+  <mat-icon>fast_forward</mat-icon>
+</button>

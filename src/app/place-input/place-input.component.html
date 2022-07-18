@@ -1,0 +1,47 @@
+<button mat-button mat-flat-button (click)="setToStartingPosition()">
+  <mat-icon>cached</mat-icon>
+</button>
+
+<div class="custom-input-container">
+  <ng-container *ngIf="showLatLongInput; else nameInput">
+    <mat-form-field appearance="outline">
+      <mat-label>Lat</mat-label>
+      <input min="-90" max="90"
+        matInput
+        type="number"
+        [value]="place.latitude | number:'1.1-4'"
+        (change)="onLatChange($event)">
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Long</mat-label>
+      <input min="-180" max="180"
+        matInput
+        type="number"
+        [value]="place.longitude | number:'1.1-4'"
+        (change)="onLongChange($event)">
+    </mat-form-field>
+  </ng-container>
+
+  <ng-template #nameInput>
+    <mat-form-field class="name-input" appearance="outline">
+      <mat-label>Where</mat-label>
+      <input
+        matInput
+        type="text"
+        [value]="place.name"
+        [matAutocomplete]="auto"
+        [formControl]="textInputFormControl">
+      <!-- <mat-icon matSuffix>pin_drop</mat-icon> -->
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option *ngFor="let option of autocompletePlaces$ | async" [value]="option">
+          {{ option }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+  </ng-template>
+</div>
+
+<button mat-button mat-mini-fab color="primary" (click)="toggleInputType()">
+  <mat-icon *ngIf="showLatLongInput">pin_drop</mat-icon>
+  <mat-icon *ngIf="!showLatLongInput">signpost</mat-icon>
+</button>

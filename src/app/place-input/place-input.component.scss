@@ -1,0 +1,26 @@
+place-input:host {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%;
+}
+
+place-input:host * {
+  cursor: pointer;
+  user-select: none;
+}
+
+::ng-deep .mat-form-field .mat-form-field-wrapper {
+  padding-bottom: 0;
+}
+
+.custom-input-container {
+  min-width: 80%;
+  justify-content: space-evenly;
+  display: flex;
+}
+
+.name-input {
+  min-width: 60%;
+}
