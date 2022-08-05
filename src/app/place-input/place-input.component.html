@@ -1,10 +1,12 @@
-<button mat-button mat-flat-button (click)="setToStartingPosition()">
+<button mat-button mat-mini-fab
+  class="reset-button"
+  (click)="setToStartingPosition()">
   <mat-icon>cached</mat-icon>
 </button>
 
 <div class="custom-input-container">
   <ng-container *ngIf="showLatLongInput; else nameInput">
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" class="lat-long-input">
       <mat-label>Lat</mat-label>
       <input min="-90" max="90"
         matInput
@@ -12,7 +14,7 @@
         [value]="place.latitude | number:'1.1-4'"
         (change)="onLatChange($event)">
     </mat-form-field>
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" class="lat-long-input">
       <mat-label>Long</mat-label>
       <input min="-180" max="180"
         matInput
@@ -41,7 +43,9 @@
   </ng-template>
 </div>
 
-<button mat-button mat-mini-fab color="primary" (click)="toggleInputType()">
+<button mat-button mat-mini-fab color="primary"
+  class="switch-input-button"
+  (click)="toggleInputType()">
   <mat-icon *ngIf="showLatLongInput">pin_drop</mat-icon>
   <mat-icon *ngIf="!showLatLongInput">signpost</mat-icon>
 </button>

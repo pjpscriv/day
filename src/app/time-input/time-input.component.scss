@@ -1,24 +1,57 @@
 time-input:host {
-  display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
   width: 95%;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "date   date     date     date"
+    "rewind prev-day next-day fforward";
+
+  row-gap: 8px;
 
   @media screen and (min-width: 700px) {
     width: 80%;
   }
+
+  @media screen and (min-width: 450px) {
+    //width: 80%;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: "rewind prev-day date next-day fforward";
+    row-gap: 0;
+  }
 }
+
+.time-input__fast-rewind-button {
+  grid-area: rewind;
+}
+.time-input__previous-day-button {
+  grid-area: prev-day;
+}
+.time-input__date-picker {
+grid-area: date;
+}
+.time-input__next-day-button {
+  grid-area: next-day;
+}
+.time-input__fast-forward-button {
+  grid-area: fforward;
+}
+
+.day-change {
+  //background-color: rebeccapurple;
+  background-color: #424242;
+  color: white;
+}
+
 
 time-input:host * {
   cursor: pointer;
   user-select: none;
+  justify-self: center;
 }
 
-#time {
-  width: 65%;
-  text-align: center;
-}
 
 ::ng-deep .mat-form-field .mat-form-field-wrapper {
   padding-bottom: 0;
