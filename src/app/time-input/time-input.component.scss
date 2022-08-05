@@ -6,8 +6,8 @@ time-input:host {
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: auto;
   grid-template-areas:
-    "date   date     date     date"
-    "rewind prev-day next-day fforward";
+    "rewind prev-day next-day fforward"
+    "date   date     date     date";
 
   row-gap: 8px;
 
