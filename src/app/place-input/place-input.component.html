@@ -1,12 +1,13 @@
 <button mat-button mat-mini-fab
-  class="reset-button"
+  class="place-input__reset-button"
   (click)="setToStartingPosition()">
   <mat-icon>cached</mat-icon>
 </button>
 
-<div class="custom-input-container">
+<div class="place-input__container">
+
   <ng-container *ngIf="showLatLongInput; else nameInput">
-    <mat-form-field appearance="outline" class="lat-long-input">
+    <mat-form-field appearance="outline" class="place-input__lat-long-input">
       <mat-label>Lat</mat-label>
       <input min="-90" max="90"
         matInput
@@ -14,7 +15,7 @@
         [value]="place.latitude | number:'1.1-4'"
         (change)="onLatChange($event)">
     </mat-form-field>
-    <mat-form-field appearance="outline" class="lat-long-input">
+    <mat-form-field appearance="outline" class="place-input__lat-long-input">
       <mat-label>Long</mat-label>
       <input min="-180" max="180"
         matInput
@@ -25,7 +26,7 @@
   </ng-container>
 
   <ng-template #nameInput>
-    <mat-form-field class="name-input" appearance="outline">
+    <mat-form-field class="place-input__name-input" appearance="outline">
       <mat-label>Where</mat-label>
       <input
         matInput
@@ -35,16 +36,17 @@
         [formControl]="textInputFormControl">
       <!-- <mat-icon matSuffix>pin_drop</mat-icon> -->
       <mat-autocomplete #auto="matAutocomplete">
-        <mat-option *ngFor="let option of autocompletePlaces$ | async" [value]="option">
-          {{ option }}
+        <mat-option *ngFor="let option of autocompletePlaces$ | async" [value]="option.id">
+          {{ option.description }}
         </mat-option>
       </mat-autocomplete>
     </mat-form-field>
   </ng-template>
+
 </div>
 
 <button mat-button mat-mini-fab color="primary"
-  class="switch-input-button"
+  class="place-input__switch-input-button"
   (click)="toggleInputType()">
   <mat-icon *ngIf="showLatLongInput">pin_drop</mat-icon>
   <mat-icon *ngIf="!showLatLongInput">signpost</mat-icon>

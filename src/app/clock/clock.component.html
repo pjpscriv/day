@@ -1,11 +1,11 @@
 <p>{{ sunrise }}</p>
 <p>{{ sunset }}</p>
-<div class="hour"
+<div class="clock__hour"
     *ngFor="let hourNum of hours"
     [style.transform]="getPosition('hour', hourNum)"></div>
-<div class="now time"
+<div class="clock__time-now"
     [style.transform]="getPosition('now')"></div>
-<div class="solarnoon time"
+<div class="clock__time-solarnoon"
     [style.transform]="getPosition('solarnoon')"></div>
-<div class="nadir time"
+<div class="clock__time-time"
     [style.transform]="getPosition('nadir')"></div>

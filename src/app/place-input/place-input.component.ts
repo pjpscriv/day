@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { map, Observable, Subject } from 'rxjs';
+import { map, Observable, Subject, switchMap, tap, filter } from 'rxjs';
 import { Place, Wellington } from '../types/place.type';
+import { GoogleMapsService } from './google-maps/google-maps.service';
 
 
 @Component({
@@ -17,7 +18,9 @@ export class PlaceInputComponent implements OnInit {
   public showLatLongInput = false;
   public textInputFormControl = new FormControl()
 
-  constructor() {
+  constructor(
+    private mapsService: GoogleMapsService
+  ) {
     this.place = Wellington;
     this.place$ = new Subject<Place>();
     this.textInputFormControl.setValue(this.place.name);
@@ -30,7 +33,10 @@ export class PlaceInputComponent implements OnInit {
     this.setToStartingPosition();
 
     this.autocompletePlaces$ = this.textInputFormControl.valueChanges.pipe(
-      map(value => ['A', 'Set', 'Of', 'Test', 'Values'].slice(value.length))
+      filter(value => !!value),
+      switchMap(value => this.mapsService.getRecommendations(value)),
+      tap(([resp, status]) => console.log(`STATUS: ${status}, LENGTH: ${!!resp ? resp.length : 'null'}`)),
+      map(([resp, status]) => status === 'OK' ? resp : [])
     )
   }
 
@@ -44,10 +50,10 @@ export class PlaceInputComponent implements OnInit {
 
     // Get User's Location
     navigator.geolocation.getCurrentPosition((position) => {
-        console.log(position);
-        this.place = { latitude: position.coords.latitude, longitude: position.coords.longitude, name: 'Your location' }
-        this.place$.next(this.copyPlace(this.place));
-      },
+      console.log(position);
+      this.place = { latitude: position.coords.latitude, longitude: position.coords.longitude, name: 'Your location' }
+      this.place$.next(this.copyPlace(this.place));
+    },
       (error) => {
         console.log('Position not given', error.message)
         // this.place = this.copyPlace(Wellington);

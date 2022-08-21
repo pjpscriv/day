@@ -1,62 +1,60 @@
 place-input:host {
-  //display: flex;
-  //flex-direction: row;
   align-items: center;
-  //justify-content: space-between;
-  width: 80%;
-
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  width: 80%;
   grid-template-rows: auto;
+
+  // Mobile View
+  grid-template-columns: 1fr 1fr;
   grid-template-areas:
     "input input"
     "reset switcher";
   row-gap: 8px;
 
+  // Desktop View
   @media screen and (min-width: 450px) {
     grid-template-columns: 1fr 4fr 1fr;
-    grid-template-areas: "reset input switcher";
+    grid-template-areas:
+      "reset input switcher";
     row-gap: 0;
   }
-}
 
-place-input:host * {
-  cursor: pointer;
-  user-select: none;
-  justify-self: center;
-}
-
-::ng-deep .mat-form-field .mat-form-field-wrapper {
-  padding-bottom: 0;
-}
-
-.custom-input-container {
-  min-width: 80%;
-  justify-content: space-evenly;
-  display: flex;
-  grid-area: input;
-  width: 100%;
-
-  @media screen and (min-width: 450px) {
-    //width: 80%;
+  * {
+    cursor: pointer;
+    user-select: none;
+    justify-self: center;
   }
 }
 
-.reset-button {
+.place-input__reset-button {
   background-color: #424242;
   color: white;
   grid-area: reset;
 }
 
-.switch-input-button {
-  grid-area: switcher;
+.place-input__container {
+  min-width: 80%;
+  justify-content: space-evenly;
+  display: flex;
+  grid-area: input;
+  width: 100%;
 }
 
-.lat-long-input {
+.place-input__lat-long-input {
   max-width: 40%;
   min-width: 80px;
 }
 
-.name-input {
+.place-input__name-input {
   min-width: 60%;
+}
+
+.place-input__switch-input-button {
+  grid-area: switcher;
+}
+
+
+// Fix up form field padding
+::ng-deep .mat-form-field .mat-form-field-wrapper {
+  padding-bottom: 0;
 }

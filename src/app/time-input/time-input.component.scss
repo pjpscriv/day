@@ -1,60 +1,53 @@
 time-input:host {
   align-items: center;
   width: 95%;
-
+  max-width: 95%;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: auto;
+
+  // Mobile View
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-areas:
     "rewind prev-day next-day fforward"
     "date   date     date     date";
-
   row-gap: 8px;
+
+  // Desktop View
+  @media screen and (min-width: 450px) {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-areas:
+      "rewind prev-day date next-day fforward";
+    row-gap: 0;
+  }
 
   @media screen and (min-width: 700px) {
     width: 80%;
   }
 
-  @media screen and (min-width: 450px) {
-    //width: 80%;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: "rewind prev-day date next-day fforward";
-    row-gap: 0;
+  * {
+    cursor: pointer;
+    user-select: none;
+    justify-self: center;
   }
 }
 
-.time-input__fast-rewind-button {
-  grid-area: rewind;
-}
-.time-input__previous-day-button {
-  grid-area: prev-day;
-}
-.time-input__date-picker {
-grid-area: date;
-}
-.time-input__next-day-button {
-  grid-area: next-day;
-}
-.time-input__fast-forward-button {
-  grid-area: fforward;
-}
+// Grid Area Names
+.time-input__fast-rewind-button { grid-area: rewind; }
+.time-input__previous-day-button { grid-area: prev-day; }
+.time-input__date-picker { grid-area: date; }
+.time-input__next-day-button { grid-area: next-day; }
+.time-input__fast-forward-button { grid-area: fforward; }
 
-.day-change {
+
+.time-input__previous-day-button,
+.time-input__next-day-button {
   //background-color: rebeccapurple;
   background-color: #424242;
   color: white;
 }
 
 
-time-input:host * {
-  cursor: pointer;
-  user-select: none;
-  justify-self: center;
-}
-
-
+// Fix up form field padding
 ::ng-deep .mat-form-field .mat-form-field-wrapper {
   padding-bottom: 0;
 }
-
-// Probably make the buttons circular
