@@ -4,6 +4,7 @@
     *ngFor="let hourNum of hours"
     [style.transform]="getPosition('hour', hourNum)"></div>
 <div class="clock__time-now"
+    (window:resize)="onResize($event)"
     [style.transform]="getPosition('now')"></div>
 <div class="clock__time-solarnoon"
     [style.transform]="getPosition('solarnoon')"></div>

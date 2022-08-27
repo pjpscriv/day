@@ -1,19 +1,26 @@
+// Override Sass min()
+@function min($numbers...) {
+  @return m#{i}n(#{$numbers});
+}
+
+$radius: min(75vw, calc((100vh - 120px) * 0.8));
+
+
 clock:host {
   border: 2px solid white;
-  width: 75vmin;
-  height: 75vmin;
-  min-width: 75vmin;
-  min-height: 75vmin;
+  width: $radius;
+  height: $radius;
+  min-width: $radius;
+  min-height: $radius;
   border-radius: 50%;
-  margin: 16px;
+  // margin: 16px;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  /* opacity: .5; */
-  /* background-image: linear-gradient(0rad, #222222 50%, transparent 50%); */
+  background-image: linear-gradient(0rad, #222222 50%, transparent 50%);
 }
 
 .clock__hour {

@@ -73,6 +73,10 @@ export class ClockComponent implements OnChanges {
     // this.addTime(new Date(this.sunTimes.nadir.getTime() + MS_PER_DAY), 'nadir');
   }
 
+  public onResize(event: any): void {
+    // Just here to trigger getPosition() on resize
+  }
+
   public hasSunriseAndSunset(sunTimes: any): boolean {
     return !isNaN(sunTimes.sunrise) && !isNaN(sunTimes.sunset);
   }
@@ -91,11 +95,11 @@ export class ClockComponent implements OnChanges {
   public getPosition(name: string, hour?: number): any {
     const dp = 1000;
     let rotation = 0;
-    let radiusShift = 34.5;
+    let length = 6;
     switch (name) {
       case 'hour':
         rotation = (hour ?? 0) * 2 * Math.PI / NUMBER_OF_HOURS;
-        radiusShift = 36.6;
+        length = 2;
         break;
       case 'nadir':
         rotation = !!this.sunTimes ? this.getRotation(this.sunTimes.nadir) : 0; // TODO: Maybe adapt here?
@@ -107,9 +111,17 @@ export class ClockComponent implements OnChanges {
         rotation = !!this.sunTimes ? this.getRotation(this.time) : 0;
         break;
     }
-    const y = Math.round((Math.sin(rotation) * radiusShift) * dp) / dp * -1;
-    const x = Math.round((Math.cos(rotation) * radiusShift) * dp) / dp;
-    return `translate(${y}vmin, ${x}vmin) rotate(${rotation}rad)`;
+
+    let radFromWidth = window.innerWidth * 0.75;
+    let radFromHeight = (window.innerHeight - 120) * 0.8;
+    const radius = Math.min(radFromWidth, radFromHeight) * 0.5;
+
+    const radiusShift = 1 - (length / 75);
+
+    const y = Math.round((Math.sin(rotation) * radius * radiusShift) * dp) / dp * -1;
+    const x = Math.round((Math.cos(rotation) * radius * radiusShift) * dp) / dp;
+
+    return `translate(${y}px, ${x}px) rotate(${rotation}rad)`;
   }
 
   private getRotation(date: Date): number {
