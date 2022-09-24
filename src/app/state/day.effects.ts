@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { catchError, map, of, switchMap } from "rxjs";
 import { GoogleMapsService } from "../place-input/google-maps/google-maps.service";
-import { DayActionTypes, GetSuggestionsFromApiAction, GetSuggestionsFromApiFailureAction, GetSuggestionsFromApiSuccessAction } from "./day.actions";
+import { GetSuggestionsFromApiAction, GetSuggestionsFromApiFailureAction, GetSuggestionsFromApiSuccessAction } from "./day.actions";
 
 @Injectable({
     providedIn: 'root'

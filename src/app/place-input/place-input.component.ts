@@ -1,12 +1,10 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { map, Observable, Subject, switchMap, tap, filter, debounceTime, combineLatest, merge } from 'rxjs';
+import { debounceTime, filter, map, merge, Observable, Subject, tap } from 'rxjs';
 import { ClearSuggestionsAction, GetSuggestionsFromApiAction } from '../state/day.actions';
 import { selectSuggestedLocations } from '../state/day.selectors';
-import { StoreState } from '../state/day.state';
 import { Place, Wellington } from '../types/place.type';
-import { GoogleMapsService } from './google-maps/google-maps.service';
 
 
 @Component({
@@ -24,8 +22,6 @@ export class PlaceInputComponent implements OnInit {
   public displayAutocomplete = true;
 
   constructor(
-    // private mapsService: GoogleMapsService,
-    // private cdRef: ChangeDetectorRef
     private store: Store
   ) {
     this.place = Wellington;
@@ -45,13 +41,6 @@ export class PlaceInputComponent implements OnInit {
       debounceTime(200),
       tap(value => this.store.dispatch(GetSuggestionsFromApiAction({ searchTerm: value})))
     ).subscribe();
-
-    // Display suggestions
-    // this.autocompletePlaces$ = this.store.select(selectSuggestedLocations).pipe(
-    //   filter((item: any) => !!item.item),
-    //   map((item: any) => item.item),
-    //   tap(thing => console.log(thing))
-    // )
 
     this.autocompletePlaces$ = merge(
       this.textInputFormControl.valueChanges,
