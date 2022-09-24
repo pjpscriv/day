@@ -1,6 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { map, Observable, Subject, switchMap, tap, filter } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { map, Observable, Subject, switchMap, tap, filter, debounceTime, combineLatest, merge } from 'rxjs';
+import { ClearSuggestionsAction, GetSuggestionsFromApiAction } from '../state/day.actions';
+import { selectSuggestedLocations } from '../state/day.selectors';
+import { StoreState } from '../state/day.state';
 import { Place, Wellington } from '../types/place.type';
 import { GoogleMapsService } from './google-maps/google-maps.service';
 
@@ -16,10 +20,13 @@ export class PlaceInputComponent implements OnInit {
   public value: string = '';
   public autocompletePlaces$ = new Observable<any[]>();
   public showLatLongInput = false;
-  public textInputFormControl = new FormControl()
+  public textInputFormControl = new FormControl();
+  public displayAutocomplete = true;
 
   constructor(
-    private mapsService: GoogleMapsService
+    // private mapsService: GoogleMapsService,
+    // private cdRef: ChangeDetectorRef
+    private store: Store
   ) {
     this.place = Wellington;
     this.place$ = new Subject<Place>();
@@ -32,11 +39,27 @@ export class PlaceInputComponent implements OnInit {
 
     this.setToStartingPosition();
 
-    this.autocompletePlaces$ = this.textInputFormControl.valueChanges.pipe(
+    // Send API Query
+    this.textInputFormControl.valueChanges.pipe(
       filter(value => !!value),
-      switchMap(value => this.mapsService.getRecommendations(value)),
-      tap(([resp, status]) => console.log(`STATUS: ${status}, LENGTH: ${!!resp ? resp.length : 'null'}`)),
-      map(([resp, status]) => status === 'OK' ? resp : [])
+      debounceTime(200),
+      tap(value => this.store.dispatch(GetSuggestionsFromApiAction({ searchTerm: value})))
+    ).subscribe();
+
+    // Display suggestions
+    // this.autocompletePlaces$ = this.store.select(selectSuggestedLocations).pipe(
+    //   filter((item: any) => !!item.item),
+    //   map((item: any) => item.item),
+    //   tap(thing => console.log(thing))
+    // )
+
+    this.autocompletePlaces$ = merge(
+      this.textInputFormControl.valueChanges,
+      this.store.select(selectSuggestedLocations)
+    ).pipe(
+      map((value: any) => {
+        return (!!value?.item) ? value.item : [];
+      })
     )
   }
 
@@ -53,6 +76,7 @@ export class PlaceInputComponent implements OnInit {
       console.log(position);
       this.place = { latitude: position.coords.latitude, longitude: position.coords.longitude, name: 'Your location' }
       this.place$.next(this.copyPlace(this.place));
+      this.store.dispatch(ClearSuggestionsAction());
     },
       (error) => {
         console.log('Position not given', error.message)

@@ -16,6 +16,13 @@ import { AppComponent } from './app.component';
 import { ClockComponent } from './clock/clock.component';
 import { TimeInputComponent } from './time-input/time-input.component';
 import { PlaceInputComponent } from './place-input/place-input.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { suggestionsReducer } from './state/day.reducer';
+import { DayEffects } from './state/day.effects';
+
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -34,7 +41,10 @@ import { PlaceInputComponent } from './place-input/place-input.component';
     MatInputModule,
     MatAutocompleteModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    StoreModule.forRoot({ suggestedLocations: suggestionsReducer }),
+    EffectsModule.forRoot([ DayEffects ]),
+    StoreDevtoolsModule.instrument({maxAge: 25, logOnly: environment.production})
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-NZ' },
