@@ -19,7 +19,7 @@ import { PlaceInputComponent } from './place-input/place-input.component';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { suggestionsReducer, placeReducer } from './state/day.reducer';
+import { suggestionsReducer, placeReducer, timeReducer } from './state/day.reducer';
 import { DayEffects } from './state/day.effects';
 
 import { environment } from '../environments/environment';
@@ -44,7 +44,7 @@ import { environment } from '../environments/environment';
     MatIconModule,
     StoreModule.forRoot({
       suggestedLocations: suggestionsReducer,
-      // time: timeReducer,
+      time: timeReducer,
       place: placeReducer
     }),
     EffectsModule.forRoot([ DayEffects ]),

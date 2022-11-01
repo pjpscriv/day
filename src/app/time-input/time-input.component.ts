@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { Store } from '@ngrx/store';
 import { MS_PER_DAY } from '../day.consts';
+import { UpdateTimeAction } from '../state/day.actions';
 
 @Component({
   selector: 'time-input',
@@ -21,15 +22,18 @@ export class TimeInputComponent {
   public onDateChange(event: MatDatepickerInputEvent<any, any>): void {
     if (!!event.value) {
       this.time = event.value;
+      this.store.dispatch(UpdateTimeAction({ time: this.time }));
     }
   }
 
   public nextDay(): void {
     this.time = new Date(this.time.getTime() + MS_PER_DAY);
+    this.store.dispatch(UpdateTimeAction({ time: this.time }));
   }
 
   public previousDay(): void {
     this.time = new Date(this.time.getTime() - MS_PER_DAY);
+    this.store.dispatch(UpdateTimeAction({ time: this.time }));
   }
 
   public timeWarpForwards(): void {

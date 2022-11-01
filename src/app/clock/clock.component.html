@@ -1,7 +1,7 @@
-<p>{{ sunrise }}</p>
-<p>{{ sunset }}</p>
+<p>{{ sunrise$ | async }}</p>
+<p>{{ sunset$ | async }}</p>
 <div class="clock__hour"
-    *ngFor="let hourNum of hours"
+    *ngFor="let hourNum of hoursList"
     [style.transform]="getPosition('hour', hourNum)"></div>
 <div class="clock__time-now"
     (window:resize)="onResize($event)"

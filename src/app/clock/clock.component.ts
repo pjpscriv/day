@@ -1,7 +1,10 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Subject, Observable, combineLatest, map, takeUntil, tap } from 'rxjs';
 import { MS_PER_DAY, NUMBER_OF_HOURS } from '../day.consts';
 import { getDayMilliseconds } from '../day.helpers';
+import { selectTime } from '../state/day.selectors';
 import { Place, Wellington } from '../types/place.type';
 
 declare var SunCalc: any;
@@ -16,61 +19,78 @@ const TRANSPARENT = "transparent";
   templateUrl: './clock.component.html',
   styleUrls: ['./clock.component.scss']
 })
-export class ClockComponent implements OnChanges {
-  @Input() public time: Date;
-  @Input() public place: Place | null;
+export class ClockComponent implements OnChanges, OnInit, OnDestroy {
+  public hoursList = Array(NUMBER_OF_HOURS).fill(0).map((_, i) => i);
   public sunTimes: any;
-  public sunrise: string;
-  public sunset: string;
-  public hours = Array(NUMBER_OF_HOURS).fill(0).map((_, i) => i);
+
+  public sunrise$ = new Observable<string>();
+  public sunset$ = new Observable<string>();
+
+  @Input() public place: Place | null;
+  private place$ = new Subject<Place>();
+
+  private destroy$ = new Subject();
 
   constructor(
     private elRef: ElementRef,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private store: Store
   ) {
-    this.time = new Date();
     this.place = Wellington;
-    this.sunrise = 'Sunrise';
-    this.sunset = 'Sunset';
     this.elRef.nativeElement.style.backgroundColour = DAY_COLOR;
+  }
+
+  public ngOnInit(): void {
+
+    const time$ = this.store.select(selectTime) as Observable<Date>;
+
+    const suntime$ = combineLatest([time$, this.place$]).pipe(
+      takeUntil(this.destroy$),
+      map(([time, place]) => this.getSunTimes(time, place)),
+      tap(sunTimes => this.sunTimes = sunTimes)
+    )
+
+    this.sunrise$ = suntime$.pipe(
+      map(sunTimes => this.hasSunriseAndSunset(sunTimes) ? this.datePipe.transform(sunTimes.sunrise, 'h:mm a') ?? '' : 'No Sunrise')
+    );
+
+    this.sunset$ = suntime$.pipe(
+      map(sunTimes => this.hasSunriseAndSunset(sunTimes) ? this.datePipe.transform(sunTimes.sunset, 'h:mm a') ?? '' : 'No Sunset')
+    );
+
+    // Gradient
+    suntime$.subscribe((sunTimes: any) => {
+      let gradient = `linear-gradient(0rad, ${NIGHT_COLOR} 50%, ${NIGHT_COLOR} 50%)`;
+      let bgColor = NIGHT_COLOR;
+
+      if (this.hasSunriseAndSunset(sunTimes)) {
+        let sunriseAngle = this.getAngle(sunTimes.sunrise);
+        let sunsetAngle  = this.getAngle(sunTimes.sunset);
+        let dayLongerThanNight = this.dayLongerThanNight(sunTimes);
+        gradient = this.getGradient(sunriseAngle, sunsetAngle, dayLongerThanNight);
+        bgColor = dayLongerThanNight ? NIGHT_COLOR : DAY_COLOR;
+
+      } else {
+        if (isNaN(this.sunTimes.night)) {
+          gradient = `linear-gradient(0rad, ${DAY_COLOR} 50%, ${DAY_COLOR} 50%)`;
+        }
+      }
+
+      this.elRef.nativeElement.style.backgroundImage = gradient;
+      this.elRef.nativeElement.style.backgroundColor = bgColor;
+
+      // // Tomorrow's nadir for nice Daylight Savings behaviour
+      // this.addTime(new Date(this.sunTimes.nadir.getTime() + MS_PER_DAY), 'nadir');
+    })
+
   }
 
 
   public ngOnChanges(changes: SimpleChanges): void {
-    const { time, place } = changes;
-
-    this.time = time?.currentValue ?? this.time;
+    const { place } = changes;
     this.place = place?.currentValue ?? this.place;
-
-    if (!this.time || !this.place) return;
-
-    this.sunTimes = this.getSunTimes(this.time, this.place);
-    let gradient = `linear-gradient(0rad, ${NIGHT_COLOR} 50%, ${NIGHT_COLOR} 50%)`;
-    let bgColor = NIGHT_COLOR;
-
-    if (this.hasSunriseAndSunset(this.sunTimes)) {
-      this.sunrise = this.datePipe.transform(this.sunTimes.sunrise, 'h:mm a') ?? '';
-      this.sunset = this.datePipe.transform(this.sunTimes.sunset, 'h:mm a') ?? '';
-
-      let sunriseAngle = this.getAngle(this.sunTimes.sunrise);
-      let sunsetAngle  = this.getAngle(this.sunTimes.sunset);
-      gradient = this.getGradient(sunriseAngle, sunsetAngle, this.dayLongerThanNight(this.sunTimes));
-      bgColor = this.dayLongerThanNight(this.sunTimes) ? NIGHT_COLOR : DAY_COLOR;
-
-    } else {
-      if (isNaN(this.sunTimes.night)) {
-        gradient = `linear-gradient(0rad, ${DAY_COLOR} 50%, ${DAY_COLOR} 50%)`;
-      }
-
-      this.sunrise = 'No Sunrise';
-      this.sunset = 'No Sunset';
-    }
-
-    this.elRef.nativeElement.style.backgroundImage = gradient;
-    this.elRef.nativeElement.style.backgroundColor = bgColor;
-
-    // // Tomorrow's nadir for nice Daylight Savings behaviour
-    // this.addTime(new Date(this.sunTimes.nadir.getTime() + MS_PER_DAY), 'nadir');
+    if (!this.place) return;
+    this.place$.next(this.place);
   }
 
   public onResize(event: any): void {
@@ -108,7 +128,7 @@ export class ClockComponent implements OnChanges {
         rotation = !!this.sunTimes ? this.getRotation(this.sunTimes.solarNoon) : Math.PI;
         break;
       case 'now':
-        rotation = !!this.sunTimes ? this.getRotation(this.time) : 0;
+        rotation = !!this.sunTimes ? this.getRotation(new Date()) : 0;
         break;
     }
 
@@ -137,5 +157,9 @@ export class ClockComponent implements OnChanges {
     var ms = getDayMilliseconds(date);
     var circle_percent = ms / MS_PER_DAY;
     return (circle_percent * 2 * Math.PI) - Math.PI / 2;
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next(null);
   }
 }
