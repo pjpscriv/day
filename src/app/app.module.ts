@@ -19,7 +19,7 @@ import { PlaceInputComponent } from './place-input/place-input.component';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { suggestionsReducer } from './state/day.reducer';
+import { suggestionsReducer, placeReducer } from './state/day.reducer';
 import { DayEffects } from './state/day.effects';
 
 import { environment } from '../environments/environment';
@@ -33,7 +33,7 @@ import { environment } from '../environments/environment';
   ],
   imports: [
     BrowserModule,
-    ReactiveFormsModule ,
+    ReactiveFormsModule,
     NoopAnimationsModule,
     MatDatepickerModule,
     MatFormFieldModule,
@@ -42,7 +42,11 @@ import { environment } from '../environments/environment';
     MatAutocompleteModule,
     MatButtonModule,
     MatIconModule,
-    StoreModule.forRoot({ suggestedLocations: suggestionsReducer }),
+    StoreModule.forRoot({
+      suggestedLocations: suggestionsReducer,
+      // time: timeReducer,
+      place: placeReducer
+    }),
     EffectsModule.forRoot([ DayEffects ]),
     StoreDevtoolsModule.instrument({maxAge: 25, logOnly: environment.production})
   ],

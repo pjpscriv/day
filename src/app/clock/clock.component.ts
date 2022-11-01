@@ -113,7 +113,8 @@ export class ClockComponent implements OnChanges {
     }
 
     let radFromWidth = window.innerWidth * 0.75;
-    let radFromHeight = (window.outerHeight - 120) * 0.8;
+    let height = Math.max(window.innerHeight, document.documentElement.clientHeight)
+    let radFromHeight = (height - 120) * 0.8;
     const radius = Math.min(radFromWidth, radFromHeight) * 0.5;
 
     const radiusShift = 1 - (length / 75);

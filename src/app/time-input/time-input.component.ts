@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { Store } from '@ngrx/store';
 import { MS_PER_DAY } from '../day.consts';
 
 @Component({
@@ -11,7 +12,9 @@ export class TimeInputComponent {
   public time: Date;
   private repeater: any;
 
-  constructor() {
+  constructor(
+    private store: Store
+  ) {
     this.time = new Date();
   }
 

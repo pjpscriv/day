@@ -37,8 +37,10 @@
         [matAutocomplete]="auto"
         [formControl]="textInputFormControl">
       <!-- <mat-icon matSuffix>pin_drop</mat-icon> -->
-      <mat-autocomplete #auto="matAutocomplete">
-        <mat-option *ngFor="let option of autocompletePlaces$ | async" [value]="option.id">
+      <mat-autocomplete #auto="matAutocomplete"
+        (optionSelected)="onLocationSelected($event)"
+        [displayWith]="getDescription">
+        <mat-option *ngFor="let option of autocompletePlaces$ | async" [value]="option">
           {{ option.description }}
         </mat-option>
       </mat-autocomplete>

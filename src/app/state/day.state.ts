@@ -1,3 +1,4 @@
+import { DefaultPlace, Place } from "../types/place.type";
 
 export type StoreState<T> = {
     isLoading: boolean;
@@ -7,8 +8,12 @@ export type StoreState<T> = {
 
 export type DayState = {
     suggestedLocations: StoreState<any[]>;
+    time: Date;
+    place: Place;
 }
 
 export const initialState: DayState = {
-    suggestedLocations: { isLoading: false, item: [] }
+    suggestedLocations: { isLoading: false, item: [] },
+    time: new Date(),
+    place: DefaultPlace
 }
