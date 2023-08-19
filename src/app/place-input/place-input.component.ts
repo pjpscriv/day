@@ -1,9 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { debounceTime, filter, map, merge, Observable, Subject, tap } from 'rxjs';
-import { ClearSuggestionsAction, GetCoordinatesFromApiAction, GetSuggestionsFromApiAction } from '../state/day.actions';
-import { selectSuggestedLocations } from '../state/day.selectors';
+import { debounceTime, filter, map, merge, Observable, tap } from 'rxjs';
+import {
+  ClearSuggestionsAction,
+  GetCoordinatesFromApiAction,
+  GetSuggestionsFromApiAction,
+  UpdatePlaceAction
+} from '../state/day.actions';
+import { selectPlace, selectSuggestedLocations } from '../state/day.selectors';
 import { Place, Wellington } from '../types/place.type';
 
 
@@ -13,25 +18,27 @@ import { Place, Wellington } from '../types/place.type';
   styleUrls: ['./place-input.component.scss']
 })
 export class PlaceInputComponent implements OnInit {
-  public place: Place;
-  public place$: Subject<Place>;
+  private place: Place;
   public value: string = '';
   public autocompletePlaces$ = new Observable<any[]>();
   public showLatLongInput = false;
   public textInputFormControl = new FormControl();
   public displayAutocomplete = true;
 
+  public place$: Observable<Place>;
+
   constructor(
     private store: Store
   ) {
     this.place = Wellington;
-    this.place$ = new Subject<Place>();
-    this.textInputFormControl.setValue(this.place.name);
+    // this.textInputFormControl.setValue(this.place.name);
+
+    this.place$ = this.store.select(selectPlace) as Observable<Place>;
   }
 
   ngOnInit(): void {
     this.place = this.copyPlace(Wellington);
-    this.place$.next(this.copyPlace(this.place));
+    this.store.dispatch(UpdatePlaceAction({ place: this.place }))
 
     this.setToStartingPosition();
 
@@ -56,33 +63,47 @@ export class PlaceInputComponent implements OnInit {
     if (!navigator.geolocation) {
       console.log("Your browser is too old to share your location :'(");
       this.place = Wellington;
-      this.place$.next(this.copyPlace(this.place));
+      this.store.dispatch(UpdatePlaceAction({ place: this.place }))
+
       return;
     }
 
     // Get User's Location
     navigator.geolocation.getCurrentPosition((position) => {
+      console.log(`User's location:`);
       console.log(position);
-      this.place = { latitude: position.coords.latitude, longitude: position.coords.longitude, name: 'Your location' }
-      this.place$.next(this.copyPlace(this.place));
+      this.place = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        name: 'Your location'
+      }
+      this.store.dispatch(UpdatePlaceAction({ place: this.place }))
       this.store.dispatch(ClearSuggestionsAction());
     },
       (error) => {
         console.log('Position not given', error.message)
-        // this.place = this.copyPlace(Wellington);
-        // this.place$.next(this.copyPlace(this.place));
       }
     );
   }
 
   public onLatChange(event: any): void {
-    this.place.latitude = +event?.target?.value;
-    this.place$.next(this.copyPlace(this.place));
+    const newLatitude = +event?.target?.value;
+    const newPlace = {
+      ...this.place,
+      latitude: newLatitude
+    }
+    this.place = newPlace;
+    this.store.dispatch(UpdatePlaceAction({ place: newPlace }))
   }
 
   public onLongChange(event: any): void {
-    this.place.longitude = +event?.target?.value;
-    this.place$.next(this.copyPlace(this.place));
+    const newLongitude = +event?.target?.value;
+    const newPlace = {
+      ...this.place,
+      longitude: newLongitude
+    }
+    this.place = newPlace;
+    this.store.dispatch(UpdatePlaceAction({ place: newPlace }))
   }
 
   public toggleInputType(): void {
@@ -91,7 +112,6 @@ export class PlaceInputComponent implements OnInit {
 
   public onLocationSelected(event: any): void {
     const thing = event.option.value;
-    // console.log(`Selected: ${thing.place_id}`);
     this.store.dispatch(GetCoordinatesFromApiAction({ placeId: thing.place_id }))
   }
 

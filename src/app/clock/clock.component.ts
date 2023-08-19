@@ -1,11 +1,12 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, Input, OnInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Subject, Observable, combineLatest, map, takeUntil, tap } from 'rxjs';
+import { combineLatest, map, Observable, startWith, Subject, takeUntil, tap, timer } from 'rxjs';
 import { MS_PER_DAY, NUMBER_OF_HOURS } from '../day.consts';
 import { getDayMilliseconds } from '../day.helpers';
-import { selectTime } from '../state/day.selectors';
-import { Place, Wellington } from '../types/place.type';
+import { selectPlace, selectTime } from '../state/day.selectors';
+import { Place } from '../types/place.type';
+import { startingTime, SunTimesType } from '../types/sunTimes.type';
 
 declare var SunCalc: any;
 const font_color  = "white";
@@ -19,16 +20,18 @@ const TRANSPARENT = "transparent";
   templateUrl: './clock.component.html',
   styleUrls: ['./clock.component.scss']
 })
-export class ClockComponent implements OnChanges, OnInit, OnDestroy {
+export class ClockComponent implements OnInit, OnDestroy {
   public hoursList = Array(NUMBER_OF_HOURS).fill(0).map((_, i) => i);
-  public sunTimes: any;
+  public sunTimes: SunTimesType = startingTime;
 
   public sunrise$ = new Observable<string>();
   public sunset$ = new Observable<string>();
 
-  @Input() public place: Place | null;
-  private place$ = new Subject<Place>();
+  public nadirPosition$ = new Observable<any>();
+  public solarNoonPosition$ = new Observable<any>();
+  public nowPosition$ = new Observable<any>();
 
+  private resize$ = new Subject();
   private destroy$ = new Subject();
 
   constructor(
@@ -36,42 +39,63 @@ export class ClockComponent implements OnChanges, OnInit, OnDestroy {
     private datePipe: DatePipe,
     private store: Store
   ) {
-    this.place = Wellington;
+    // this.place = Wellington;
     this.elRef.nativeElement.style.backgroundColour = DAY_COLOR;
   }
 
   public ngOnInit(): void {
 
     const time$ = this.store.select(selectTime) as Observable<Date>;
+    const place$ = this.store.select(selectPlace) as Observable<Place>;
 
-    const suntime$ = combineLatest([time$, this.place$]).pipe(
+    const sunTime$: Observable<SunTimesType> = combineLatest([time$, place$]).pipe(
       takeUntil(this.destroy$),
       map(([time, place]) => this.getSunTimes(time, place)),
-      tap(sunTimes => this.sunTimes = sunTimes)
+      // tap(sunTimes => console.log(sunTimes)),
+      tap(sunTimes => this.sunTimes = sunTimes),
     )
 
-    this.sunrise$ = suntime$.pipe(
+    const resize$ = this.resize$.pipe(startWith(null));
+
+    this.sunrise$ = sunTime$.pipe(
       map(sunTimes => this.hasSunriseAndSunset(sunTimes) ? this.datePipe.transform(sunTimes.sunrise, 'h:mm a') ?? '' : 'No Sunrise')
     );
 
-    this.sunset$ = suntime$.pipe(
+    this.sunset$ = sunTime$.pipe(
       map(sunTimes => this.hasSunriseAndSunset(sunTimes) ? this.datePipe.transform(sunTimes.sunset, 'h:mm a') ?? '' : 'No Sunset')
     );
 
+    this.nadirPosition$ = combineLatest([sunTime$, resize$]).pipe(
+      map(([st, _]) => !!st?.nadir ? this.getRotation(st.nadir) : 0),
+      map(r => this.getTranslation(r))
+    );
+    this.solarNoonPosition$ = combineLatest([sunTime$, resize$]).pipe(
+      map(([st, _]) => !!st?.solarNoon ? this.getRotation(st.solarNoon) : Math.PI),
+      map(r => this.getTranslation(r))
+    );
+
+    // NB: Updates every second
+    this.nowPosition$ = combineLatest([timer(0, 1000 ), resize$]).pipe(
+      startWith([null, null]),
+      map(([i, _]) => this.getRotation(new Date())),
+      map(r => this.getTranslation(r)),
+      // tap(_ => console.count('hello'))
+    );
+
     // Gradient
-    suntime$.subscribe((sunTimes: any) => {
+    sunTime$.subscribe((sunTimes: SunTimesType) => {
       let gradient = `linear-gradient(0rad, ${NIGHT_COLOR} 50%, ${NIGHT_COLOR} 50%)`;
       let bgColor = NIGHT_COLOR;
 
       if (this.hasSunriseAndSunset(sunTimes)) {
-        let sunriseAngle = this.getAngle(sunTimes.sunrise);
-        let sunsetAngle  = this.getAngle(sunTimes.sunset);
+        let sunriseAngle = this.getAngle(sunTimes.sunrise as Date);
+        let sunsetAngle  = this.getAngle(sunTimes.sunset as Date);
         let dayLongerThanNight = this.dayLongerThanNight(sunTimes);
         gradient = this.getGradient(sunriseAngle, sunsetAngle, dayLongerThanNight);
         bgColor = dayLongerThanNight ? NIGHT_COLOR : DAY_COLOR;
 
       } else {
-        if (isNaN(this.sunTimes.night)) {
+        if (sunTimes.night === null) {
           gradient = `linear-gradient(0rad, ${DAY_COLOR} 50%, ${DAY_COLOR} 50%)`;
         }
       }
@@ -79,26 +103,19 @@ export class ClockComponent implements OnChanges, OnInit, OnDestroy {
       this.elRef.nativeElement.style.backgroundImage = gradient;
       this.elRef.nativeElement.style.backgroundColor = bgColor;
 
-      // // Tomorrow's nadir for nice Daylight Savings behaviour
+      // Tomorrow's nadir for nice Daylight Savings behaviour
       // this.addTime(new Date(this.sunTimes.nadir.getTime() + MS_PER_DAY), 'nadir');
     })
 
   }
 
-
-  public ngOnChanges(changes: SimpleChanges): void {
-    const { place } = changes;
-    this.place = place?.currentValue ?? this.place;
-    if (!this.place) return;
-    this.place$.next(this.place);
-  }
-
   public onResize(event: any): void {
     // Just here to trigger getPosition() on resize
+    this.resize$.next(null);
   }
 
-  public hasSunriseAndSunset(sunTimes: any): boolean {
-    return !isNaN(sunTimes.sunrise) && !isNaN(sunTimes.sunset);
+  public hasSunriseAndSunset(sunTimes: SunTimesType): boolean {
+    return sunTimes.sunrise !== null && sunTimes.sunset !== null;
   }
 
   public dayLongerThanNight(sunTimes: any): boolean {
@@ -106,35 +123,27 @@ export class ClockComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   public getGradient(sunriseAngle: any, sunsetAngle: any, isDay: boolean): string {
-    const colour1 = isDay ? TRANSPARENT : NIGHT_COLOR;
-    const colour2 = isDay ? DAY_COLOR : TRANSPARENT;
+    const colour1 : string = isDay ? TRANSPARENT : NIGHT_COLOR;
+    const colour2 : string = isDay ? DAY_COLOR : TRANSPARENT;
     return `linear-gradient(${sunriseAngle}rad, ${colour1} 50%, ${colour2} 50%),
             linear-gradient(${sunsetAngle}rad, ${colour2} 50%, ${colour1} 50%)`;
   }
 
-  public getPosition(name: string, hour?: number): any {
-    const dp = 1000;
-    let rotation = 0;
-    let length = 6;
-    switch (name) {
-      case 'hour':
-        rotation = (hour ?? 0) * 2 * Math.PI / NUMBER_OF_HOURS;
-        length = 2;
-        break;
-      case 'nadir':
-        rotation = !!this.sunTimes ? this.getRotation(this.sunTimes.nadir) : 0; // TODO: Maybe adapt here?
-        break;
-      case 'solarnoon':
-        rotation = !!this.sunTimes ? this.getRotation(this.sunTimes.solarNoon) : Math.PI;
-        break;
-      case 'now':
-        rotation = !!this.sunTimes ? this.getRotation(new Date()) : 0;
-        break;
-    }
+  public getHourPosition(name: string, hour?: number): any {
+    const rotation = (hour ?? 0) * 2 * Math.PI / NUMBER_OF_HOURS;
+    return this.getTranslation(rotation, 2);
+  }
 
-    let radFromWidth = window.innerWidth * 0.75;
-    let height = Math.max(window.innerHeight, document.documentElement.clientHeight)
-    let radFromHeight = (height - 120) * 0.8;
+  private getRotation(date: Date): number {
+    return 2 * Math.PI * (getDayMilliseconds(date) / MS_PER_DAY);
+  }
+
+  private getTranslation(rotation: number, length: number = 6) {
+    const dp = 1000;
+
+    const radFromWidth = window.innerWidth * 0.75;
+    const height = Math.max(window.innerHeight, document.documentElement.clientHeight)
+    const radFromHeight = (height - 120) * 0.8;
     const radius = Math.min(radFromWidth, radFromHeight) * 0.5;
 
     const radiusShift = 1 - (length / 75);
@@ -145,17 +154,13 @@ export class ClockComponent implements OnChanges, OnInit, OnDestroy {
     return `translate(${y}px, ${x}px) rotate(${rotation}rad)`;
   }
 
-  private getRotation(date: Date): number {
-    return 2 * Math.PI * (getDayMilliseconds(date) / MS_PER_DAY);
-  }
-
   private getSunTimes(time: Date, place: Place): any {
     return SunCalc.getTimes(time, place.latitude, place.longitude);
   }
 
   private getAngle(date: Date): number {
-    var ms = getDayMilliseconds(date);
-    var circle_percent = ms / MS_PER_DAY;
+    let ms = getDayMilliseconds(date);
+    let circle_percent = ms / MS_PER_DAY;
     return (circle_percent * 2 * Math.PI) - Math.PI / 2;
   }
 

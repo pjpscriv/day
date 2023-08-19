@@ -1,4 +1,5 @@
 import { createAction, props } from "@ngrx/store";
+import { Place } from '../types/place.type';
 
 export enum DayActionTypes {
     GET_SUGGECTIONS                  = '[Suggections] Get',
@@ -10,7 +11,8 @@ export enum DayActionTypes {
     GET_COORDINATES_FROM_API         = '[Coordinates] Get From API',
     GET_COORDINATES_FROM_API_SUCCESS = '[Coordinates] Get From API Success',
     GET_COORDINATES_FROM_API_FAILURE = '[Coordinates] Get From API Failure',
-    UPDATE_TIME_ACTION               = '[Time] Update'
+    UPDATE_TIME_ACTION               = '[Time] Update',
+    UPDATE_PLACE_ACTION              = '[Place] Update'
 }
 
 // Suggestions
@@ -32,6 +34,7 @@ export const GetSuggestionsFromApiFailureAction = createAction(
 export const ClearSuggestionsAction = createAction(
     DayActionTypes.CLEAR_SUGGECTIONS
 );
+
 
 // Place (Coordinates)
 export const GetCoordinatesAction = createAction(
@@ -55,9 +58,15 @@ export const GetCoordinatesFromApiFailureAction = createAction(
 );
 
 
-
 // Time
 export const UpdateTimeAction = createAction(
     DayActionTypes.UPDATE_TIME_ACTION,
     props<{ time: Date }>()
+)
+
+
+// Place
+export const UpdatePlaceAction = createAction(
+  DayActionTypes.UPDATE_PLACE_ACTION,
+  props<{ place: Place }>()
 )

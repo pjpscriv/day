@@ -1,5 +1,13 @@
 import { createReducer, on } from "@ngrx/store";
-import { ClearSuggestionsAction, GetCoordinatesFromApiSuccessAction, GetSuggestionsFromApiAction, GetSuggestionsFromApiFailureAction, GetSuggestionsFromApiSuccessAction, UpdateTimeAction } from "./day.actions";
+import {
+  ClearSuggestionsAction,
+  GetCoordinatesFromApiSuccessAction,
+  GetSuggestionsFromApiAction,
+  GetSuggestionsFromApiFailureAction,
+  GetSuggestionsFromApiSuccessAction,
+  UpdatePlaceAction,
+  UpdateTimeAction
+} from './day.actions';
 import { initialState } from "./day.state";
 
 
@@ -21,10 +29,11 @@ export const suggestionsReducer = createReducer(
 
 export const placeReducer = createReducer(
     initialState.place,
-    on(GetCoordinatesFromApiSuccessAction, (place, { response }) => {
+    on(GetCoordinatesFromApiSuccessAction, (_, { response }) => {
         let loc = response.geometry.location;
         return { name: response.name, latitude: loc.lat(), longitude: loc.lng() }
-    })
+    }),
+    on(UpdatePlaceAction, (_, { place }) => place)
 );
 
 export const timeReducer = createReducer(

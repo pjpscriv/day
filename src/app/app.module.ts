@@ -19,6 +19,7 @@ import { PlaceInputComponent } from './place-input/place-input.component';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
 import { suggestionsReducer, placeReducer, timeReducer } from './state/day.reducer';
 import { DayEffects } from './state/day.effects';
 

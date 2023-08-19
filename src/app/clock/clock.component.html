@@ -2,11 +2,11 @@
 <p>{{ sunset$ | async }}</p>
 <div class="clock__hour"
     *ngFor="let hourNum of hoursList"
-    [style.transform]="getPosition('hour', hourNum)"></div>
-<div class="clock__time-now"
+    [style.transform]="getHourPosition('hour', hourNum)"></div>
+<div class="clock__time clock__time-now"
     (window:resize)="onResize($event)"
-    [style.transform]="getPosition('now')"></div>
-<div class="clock__time-solarnoon"
-    [style.transform]="getPosition('solarnoon')"></div>
-<div class="clock__time-time"
-    [style.transform]="getPosition('nadir')"></div>
+    [style.transform]="nowPosition$ | async"></div>
+<div class="clock__time clock__time-solar-noon"
+    [style.transform]="solarNoonPosition$ | async"></div>
+<div class="clock__time clock__time-nadir"
+    [style.transform]="nadirPosition$ | async"></div>

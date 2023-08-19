@@ -1,0 +1,33 @@
+export type SunTimesType = {
+  dawn: Date | null,
+  dusk: Date | null,
+  goldenHour: Date | null,
+  goldenHourEnd: Date | null,
+  nadir: Date | null,
+  nauticalDawn: Date | null,
+  nauticalDusk: Date | null,
+  night: Date | null,
+  nightEnd: Date | null,
+  solarNoon: Date | null,
+  sunrise: Date | null,
+  sunriseEnd: Date | null,
+  sunset: Date | null,
+  sunsetStart: Date | null,
+}
+
+export const startingTime: SunTimesType = {
+  dawn: null,
+  dusk: null,
+  goldenHour: null,
+  goldenHourEnd: null,
+  nadir: null,
+  nauticalDawn: null,
+  nauticalDusk: null,
+  night: null,
+  nightEnd: null,
+  solarNoon: null,
+  sunrise: null,
+  sunriseEnd: null,
+  sunset: null,
+  sunsetStart: null,
+};

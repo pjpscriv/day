@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { Store } from '@ngrx/store';
 import { MS_PER_DAY } from '../day.consts';
@@ -9,7 +9,7 @@ import { UpdateTimeAction } from '../state/day.actions';
   templateUrl: './time-input.component.html',
   styleUrls: ['./time-input.component.scss']
 })
-export class TimeInputComponent {
+export class TimeInputComponent implements OnInit {
   public time: Date;
   private repeater: any;
 
@@ -17,6 +17,10 @@ export class TimeInputComponent {
     private store: Store
   ) {
     this.time = new Date();
+  }
+
+  public ngOnInit() {
+    this.store.dispatch(UpdateTimeAction({ time: this.time }));
   }
 
   public onDateChange(event: MatDatepickerInputEvent<any, any>): void {

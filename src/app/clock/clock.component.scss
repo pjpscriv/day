@@ -25,18 +25,16 @@ clock:host {
 .clock__hour {
   background-color: white;
   position: absolute;
-  width: 5px;
+  width: 3px;
   height: 2vmin;
 }
 
-.clock__time-now,
-.clock__time-solarnoon,
-.clock__time-nadir {
+.clock__time {
   position: absolute;
   width: 5px;
   height: 6vmin;
 }
 
 .clock__time-now { background-color: tomato; }
-.clock__time-solarnoon { background-color: gold; }
+.clock__time-solar-noon { background-color: gold; }
 .clock__time-nadir { background-color: #eeeeee; }
