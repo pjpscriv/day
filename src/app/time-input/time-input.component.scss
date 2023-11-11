@@ -38,12 +38,11 @@ time-input:host {
 .time-input__next-day-button { grid-area: next-day; }
 .time-input__fast-forward-button { grid-area: fforward; }
 
-
-.time-input__previous-day-button,
-.time-input__next-day-button {
+time-input:host button.mat-button {
   //background-color: rebeccapurple;
-  background-color: #424242;
-  color: white;
+  background-color: #82BCE6;
+  color: #1C3882;
+  box-shadow: none;
 }
 
 

@@ -7,7 +7,7 @@ $radius: min(75vw, calc((100vh - 120px) * 0.8));
 
 
 clock:host {
-  border: 2px solid white;
+  // border: 2px solid white;
   width: $radius;
   height: $radius;
   min-width: $radius;
@@ -22,19 +22,48 @@ clock:host {
   background-image: linear-gradient(0rad, #222222 50%, transparent 50%);
 }
 
-.clock__hour {
-  background-color: white;
+.clock__label_text {
   position: absolute;
-  width: 3px;
+  font-size: 20px;
+}
+
+.clock__hour,
+.clock__minute {
+  background-color: #C8E2F4;
+  position: absolute;
+  opacity: 1.0;
+}
+
+.clock__hour {
+  width: 5px;
   height: 2vmin;
+}
+
+.clock__minute {
+  width: 2px;
+  height: 1vmin;
 }
 
 .clock__time {
   position: absolute;
-  width: 5px;
-  height: 6vmin;
+  width: 25px;
+  height: 25px;
+  border-radius: 30px;;
 }
 
-.clock__time-now { background-color: tomato; }
-.clock__time-solar-noon { background-color: gold; }
-.clock__time-nadir { background-color: #eeeeee; }
+.clock__time-now {
+  width: 18px;
+  height: 18px;
+  background-color: #FF4040;
+  z-index: 100;
+}
+
+.clock__time-solar-noon {
+  background-color: gold;
+  box-shadow: 0 0 4px rgb(255, 248, 210);
+}
+
+.clock__time-nadir {
+  background-color: #eeeeee;
+  box-shadow: 0 0 4px #333333;
+}

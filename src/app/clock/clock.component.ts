@@ -9,11 +9,10 @@ import { Place } from '../types/place.type';
 import { startingTime, SunTimesType } from '../types/sunTimes.type';
 
 declare var SunCalc: any;
-const font_color  = "white";
-const line_width  = 4;
+
 const DAY_COLOR   = "rgb(62, 88, 128)";
 const NIGHT_COLOR = "#222222";
-const TRANSPARENT = "transparent";
+const NUMBER_OF_MINUTES = NUMBER_OF_HOURS * 6;
 
 @Component({
   selector: 'clock',
@@ -22,10 +21,18 @@ const TRANSPARENT = "transparent";
 })
 export class ClockComponent implements OnInit, OnDestroy {
   public hoursList = Array(NUMBER_OF_HOURS).fill(0).map((_, i) => i);
+  public minutes = Array(NUMBER_OF_MINUTES).fill(0).map((_, i) => i).filter(v => v % 6 != 0)
   public sunTimes: SunTimesType = startingTime;
 
   public sunrise$ = new Observable<string>();
   public sunset$ = new Observable<string>();
+  public solarNoon$ = new Observable<string>();
+  public nadir$ = new Observable<string>();
+
+  public sunrisePosition$ = new Observable<any>();
+  public sunsetPosition$ = new Observable<any>();
+  public solarNoonLabelPosition$ = new Observable<any>();
+  public nadirLabelPosition$ = new Observable<any>();
 
   public nadirPosition$ = new Observable<any>();
   public solarNoonPosition$ = new Observable<any>();
@@ -45,34 +52,59 @@ export class ClockComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
 
+    // Inputs
     const time$ = this.store.select(selectTime) as Observable<Date>;
     const place$ = this.store.select(selectPlace) as Observable<Place>;
 
     const sunTime$: Observable<SunTimesType> = combineLatest([time$, place$]).pipe(
       takeUntil(this.destroy$),
       map(([time, place]) => this.getSunTimes(time, place)),
-      // tap(sunTimes => console.log(sunTimes)),
       tap(sunTimes => this.sunTimes = sunTimes),
     )
 
     const resize$ = this.resize$.pipe(startWith(null));
 
+    // Outputs
     this.sunrise$ = sunTime$.pipe(
       map(sunTimes => this.hasSunriseAndSunset(sunTimes) ? this.datePipe.transform(sunTimes.sunrise, 'h:mm a') ?? '' : 'No Sunrise')
+    );
+    this.sunrisePosition$ = combineLatest([sunTime$, resize$]).pipe(
+      map(([st, _]) => !!st?.sunrise ? this.getRotation(st.sunrise) : 0),
+      map(r => this.getTranslation(r, 20, false))
     );
 
     this.sunset$ = sunTime$.pipe(
       map(sunTimes => this.hasSunriseAndSunset(sunTimes) ? this.datePipe.transform(sunTimes.sunset, 'h:mm a') ?? '' : 'No Sunset')
     );
+    this.sunsetPosition$ = combineLatest([sunTime$, resize$]).pipe(
+      map(([st, _]) => !!st?.sunset ? this.getRotation(st.sunset) : Math.PI),
+      map(r => this.getTranslation(r, 20, false))
+    );
 
-    this.nadirPosition$ = combineLatest([sunTime$, resize$]).pipe(
-      map(([st, _]) => !!st?.nadir ? this.getRotation(st.nadir) : 0),
-      map(r => this.getTranslation(r))
+    this.solarNoon$ = sunTime$.pipe(
+      map(sunTimes => this.datePipe.transform(sunTimes.solarNoon, 'h:mm a') ?? '')
+    )
+    this.solarNoonLabelPosition$ = combineLatest([sunTime$, resize$]).pipe(
+      map(([st, _]) => !!st?.solarNoon ? this.getRotation(st.solarNoon) : Math.PI),
+      map(r => this.getTranslation(r, 20, false))
     );
     this.solarNoonPosition$ = combineLatest([sunTime$, resize$]).pipe(
       map(([st, _]) => !!st?.solarNoon ? this.getRotation(st.solarNoon) : Math.PI),
       map(r => this.getTranslation(r))
     );
+
+    this.nadir$ = sunTime$.pipe(
+      map(sunTimes => this.datePipe.transform(sunTimes.nadir, 'h:mm a') ?? '')
+    )
+    this.nadirLabelPosition$ = combineLatest([sunTime$, resize$]).pipe(
+      map(([st, _]) => !!st?.nadir ? this.getRotation(st.nadir) : Math.PI),
+      map(r => this.getTranslation(r, 14, false))
+    );
+    this.nadirPosition$ = combineLatest([sunTime$, resize$]).pipe(
+      map(([st, _]) => !!st?.nadir ? this.getRotation(st.nadir) : 0),
+      map(r => this.getTranslation(r))
+    );
+
 
     // NB: Updates every second
     this.nowPosition$ = combineLatest([timer(0, 1000 ), resize$]).pipe(
@@ -114,8 +146,8 @@ export class ClockComponent implements OnInit, OnDestroy {
     this.resize$.next(null);
   }
 
-  public hasSunriseAndSunset(sunTimes: SunTimesType): boolean {
-    return sunTimes.sunrise !== null && sunTimes.sunset !== null;
+  public hasSunriseAndSunset(sunTimes: any): boolean {
+    return !isNaN(sunTimes.sunrise) && !isNaN(sunTimes.sunset);
   }
 
   public dayLongerThanNight(sunTimes: any): boolean {
@@ -123,22 +155,27 @@ export class ClockComponent implements OnInit, OnDestroy {
   }
 
   public getGradient(sunriseAngle: any, sunsetAngle: any, isDay: boolean): string {
-    const colour1 : string = isDay ? TRANSPARENT : NIGHT_COLOR;
-    const colour2 : string = isDay ? DAY_COLOR : TRANSPARENT;
+    const colour1 : string = isDay ? 'transparent' : NIGHT_COLOR;
+    const colour2 : string = isDay ? DAY_COLOR : 'transparent';
     return `linear-gradient(${sunriseAngle}rad, ${colour1} 50%, ${colour2} 50%),
             linear-gradient(${sunsetAngle}rad, ${colour2} 50%, ${colour1} 50%)`;
   }
 
-  public getHourPosition(name: string, hour?: number): any {
+  public getHourPosition(hour?: number): any {
     const rotation = (hour ?? 0) * 2 * Math.PI / NUMBER_OF_HOURS;
     return this.getTranslation(rotation, 2);
+  }
+
+  public getMinutePosition(min?: number): any {
+    const rotation = (min ?? 0) * 2 * Math.PI / NUMBER_OF_MINUTES;
+    return this.getTranslation(rotation, 1);
   }
 
   private getRotation(date: Date): number {
     return 2 * Math.PI * (getDayMilliseconds(date) / MS_PER_DAY);
   }
 
-  private getTranslation(rotation: number, length: number = 6) {
+  private getTranslation(rotation: number, length: number = 6, includeRotation: boolean = true) {
     const dp = 1000;
 
     const radFromWidth = window.innerWidth * 0.75;
@@ -151,7 +188,7 @@ export class ClockComponent implements OnInit, OnDestroy {
     const y = Math.round((Math.sin(rotation) * radius * radiusShift) * dp) / dp * -1;
     const x = Math.round((Math.cos(rotation) * radius * radiusShift) * dp) / dp;
 
-    return `translate(${y}px, ${x}px) rotate(${rotation}rad)`;
+    return `translate(${y}px, ${x}px) rotate(${includeRotation ? rotation : 0}rad)`;
   }
 
   private getSunTimes(time: Date, place: Place): any {

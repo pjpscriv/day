@@ -6,7 +6,8 @@ import {
   ClearSuggestionsAction,
   GetCoordinatesFromApiAction,
   GetSuggestionsFromApiAction,
-  UpdatePlaceAction
+  UpdatePlaceAction,
+  UpdateTimeAction
 } from '../state/day.actions';
 import { selectPlace, selectSuggestedLocations } from '../state/day.selectors';
 import { Place, Wellington } from '../types/place.type';
@@ -113,6 +114,11 @@ export class PlaceInputComponent implements OnInit {
   public onLocationSelected(event: any): void {
     const thing = event.option.value;
     this.store.dispatch(GetCoordinatesFromApiAction({ placeId: thing.place_id }))
+  }
+
+  public reset() {
+    this.setToStartingPosition();
+    this.store.dispatch(UpdateTimeAction({ time: new Date() }));
   }
 
   public getDescription(option: any) {
