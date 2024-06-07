@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - nane: Save key
+      - name: Save key
         run: echo "export const KEY = '${{ SECRETS.GOOGLE_MAPS_PLATFORM_PROD_KEY }}';" > key.ts
 
       - name: All things angular
