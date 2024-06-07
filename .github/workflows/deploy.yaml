@@ -10,6 +10,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - nane: Save key
+        run: echo "export const KEY = '${{ SECRETS.GOOGLE_MAPS_PLATFORM_PROD_KEY }}';" > key.ts
+
       - name: All things angular
         uses: AhsanAyaz/angular-deploy-gh-pages-actions@v1.3.2
         with:
