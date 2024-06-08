@@ -1,3 +1,5 @@
+@import '../shared.styles.scss';
+
 time-input:host {
   align-items: center;
   width: 95%;
@@ -31,6 +33,35 @@ time-input:host {
   }
 }
 
+.time-input__fast-rewind-button,
+.time-input__fast-forward-button {
+  display: none;
+}
+
+.time-input__previous-day-button,
+.time-input__next-day-button {
+  width: 20px;
+  height: 20px;
+
+  mat-icon {
+    margin-top: -21px;
+  }
+}
+
+.time-input__next-day-button mat-icon {
+  margin-left: -1px;
+}
+.time-input__previous-day-button mat-icon {
+  margin-left: -3px;
+}
+
+.time-input__date-picker {
+  text-align: center;
+  font-size: 2em;
+  min-width: max-content;
+}
+
+
 // Grid Area Names
 .time-input__fast-rewind-button { grid-area: rewind; }
 .time-input__previous-day-button { grid-area: prev-day; }
@@ -40,13 +71,13 @@ time-input:host {
 
 time-input:host button.mat-button {
   //background-color: rebeccapurple;
-  background-color: #82BCE6;
-  color: #1C3882;
+  background-color: $button-background;
+  color: $button-color;
   box-shadow: none;
 }
 
 
 // Fix up form field padding
-::ng-deep .mat-form-field .mat-form-field-wrapper {
-  padding-bottom: 0;
-}
+// ::ng-deep .mat-form-field .mat-form-field-wrapper {
+//   padding-bottom: 0;
+// }

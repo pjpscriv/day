@@ -1,13 +1,13 @@
-<button mat-button mat-mini-fab
-  class="place-input__reset-button"
-  (click)="reset()">
-  <mat-icon>cached</mat-icon>
+<button mat-button mat-mini-fab color="primary"
+  class="place-input__switch-input-button"
+  (click)="toggleInputType()">
+  <mat-icon *ngIf="showLatLongInput">pin_drop</mat-icon>
+  <mat-icon *ngIf="!showLatLongInput">signpost</mat-icon>
 </button>
 
-<div class="place-input__container">
+<div *ngIf="place$ | async as place" class="place-input__container">
 
-  <!-- Latitude / Longitude Input -->
-  <ng-container *ngIf="place$ | async as place">
+    <!-- Latitude / Longitude Input -->
     <ng-container *ngIf="showLatLongInput; else nameInput">
       <mat-form-field appearance="outline" class="place-input__lat-long-input">
         <mat-label>Lat</mat-label>
@@ -30,7 +30,6 @@
     <!-- Place Name Input -->
     <ng-template #nameInput>
       <mat-form-field class="place-input__name-input" appearance="outline">
-        <mat-label>Where</mat-label>
         <input
           matInput
           type="text"
@@ -48,12 +47,10 @@
       </mat-form-field>
     </ng-template>
 
-  </ng-container>
 </div>
 
-<button mat-button mat-mini-fab color="primary"
-  class="place-input__switch-input-button"
-  (click)="toggleInputType()">
-  <mat-icon *ngIf="showLatLongInput">pin_drop</mat-icon>
-  <mat-icon *ngIf="!showLatLongInput">signpost</mat-icon>
+<button mat-button mat-mini-fab
+  class="place-input__reset-button"
+  (click)="reset()">
+  <mat-icon>cached</mat-icon>
 </button>

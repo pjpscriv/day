@@ -1,3 +1,5 @@
+@import '../shared.styles';
+
 place-input:host {
   align-items: center;
   display: grid;
@@ -15,7 +17,7 @@ place-input:host {
   @media screen and (min-width: 450px) {
     grid-template-columns: 1fr 4fr 1fr;
     grid-template-areas:
-      "reset input switcher";
+      "switcher input reset";
     row-gap: 0;
   }
 
@@ -27,9 +29,10 @@ place-input:host {
 }
 
 .place-input__reset-button {
-  background-color: #424242;
-  color: white;
+  background-color: $button-background;
+  color: $button-color;
   grid-area: reset;
+  box-shadow: none;  
 }
 
 .place-input__container {
@@ -50,6 +53,7 @@ place-input:host {
 }
 
 .place-input__switch-input-button {
+  display: none;
   grid-area: switcher;
 }
 

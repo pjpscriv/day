@@ -10,9 +10,12 @@ import { startingTime, SunTimesType } from '../types/sunTimes.type';
 
 declare var SunCalc: any;
 
-const DAY_COLOR   = "rgb(62, 88, 128)";
+// TODO: Move to constants file
+const DAY_COLOR   = "#5198C2";
 const NIGHT_COLOR = "#222222";
 const NUMBER_OF_MINUTES = NUMBER_OF_HOURS * 6;
+const SUN_MOON_INDENT = 13;
+const LABEL_INDENT = 22;
 
 @Component({
   selector: 'clock',
@@ -66,7 +69,7 @@ export class ClockComponent implements OnInit, OnDestroy {
 
     // Outputs
     this.sunrise$ = sunTime$.pipe(
-      map(sunTimes => this.hasSunriseAndSunset(sunTimes) ? this.datePipe.transform(sunTimes.sunrise, 'h:mm a') ?? '' : 'No Sunrise')
+      map(sunTimes => this.hasSunriseAndSunset(sunTimes) ? this.datePipe.transform(sunTimes.sunrise, 'h:mma')?.toLowerCase() ?? '' : 'No Sunrise')
     );
     this.sunrisePosition$ = combineLatest([sunTime$, resize$]).pipe(
       map(([st, _]) => !!st?.sunrise ? this.getRotation(st.sunrise) : 0),
@@ -74,7 +77,7 @@ export class ClockComponent implements OnInit, OnDestroy {
     );
 
     this.sunset$ = sunTime$.pipe(
-      map(sunTimes => this.hasSunriseAndSunset(sunTimes) ? this.datePipe.transform(sunTimes.sunset, 'h:mm a') ?? '' : 'No Sunset')
+      map(sunTimes => this.hasSunriseAndSunset(sunTimes) ? this.datePipe.transform(sunTimes.sunset, 'h:mma')?.toLowerCase() ?? '' : 'No Sunset')
     );
     this.sunsetPosition$ = combineLatest([sunTime$, resize$]).pipe(
       map(([st, _]) => !!st?.sunset ? this.getRotation(st.sunset) : Math.PI),
@@ -82,36 +85,35 @@ export class ClockComponent implements OnInit, OnDestroy {
     );
 
     this.solarNoon$ = sunTime$.pipe(
-      map(sunTimes => this.datePipe.transform(sunTimes.solarNoon, 'h:mm a') ?? '')
+      map(sunTimes => this.datePipe.transform(sunTimes.solarNoon, 'h:mma')?.toLowerCase() ?? '')
     )
     this.solarNoonLabelPosition$ = combineLatest([sunTime$, resize$]).pipe(
       map(([st, _]) => !!st?.solarNoon ? this.getRotation(st.solarNoon) : Math.PI),
-      map(r => this.getTranslation(r, 20, false))
+      map(r => this.getTranslation(r, LABEL_INDENT + 5, false))
     );
     this.solarNoonPosition$ = combineLatest([sunTime$, resize$]).pipe(
       map(([st, _]) => !!st?.solarNoon ? this.getRotation(st.solarNoon) : Math.PI),
-      map(r => this.getTranslation(r))
+      map(r => this.getTranslation(r, SUN_MOON_INDENT))
     );
 
     this.nadir$ = sunTime$.pipe(
-      map(sunTimes => this.datePipe.transform(sunTimes.nadir, 'h:mm a') ?? '')
+      map(sunTimes => this.datePipe.transform(sunTimes.nadir, 'h:mma')?.toLowerCase() ?? '')
     )
     this.nadirLabelPosition$ = combineLatest([sunTime$, resize$]).pipe(
       map(([st, _]) => !!st?.nadir ? this.getRotation(st.nadir) : Math.PI),
-      map(r => this.getTranslation(r, 14, false))
+      map(r => this.getTranslation(r, LABEL_INDENT, false))
     );
     this.nadirPosition$ = combineLatest([sunTime$, resize$]).pipe(
       map(([st, _]) => !!st?.nadir ? this.getRotation(st.nadir) : 0),
-      map(r => this.getTranslation(r))
+      map(r => this.getTranslation(r, SUN_MOON_INDENT))
     );
 
 
-    // NB: Updates every second
+    // Updates every second
     this.nowPosition$ = combineLatest([timer(0, 1000 ), resize$]).pipe(
       startWith([null, null]),
       map(([i, _]) => this.getRotation(new Date())),
-      map(r => this.getTranslation(r)),
-      // tap(_ => console.count('hello'))
+      map(r => this.getTranslation(r, 3))
     );
 
     // Gradient
@@ -163,12 +165,12 @@ export class ClockComponent implements OnInit, OnDestroy {
 
   public getHourPosition(hour?: number): any {
     const rotation = (hour ?? 0) * 2 * Math.PI / NUMBER_OF_HOURS;
-    return this.getTranslation(rotation, 2);
+    return this.getTranslation(rotation, 5);
   }
 
   public getMinutePosition(min?: number): any {
     const rotation = (min ?? 0) * 2 * Math.PI / NUMBER_OF_MINUTES;
-    return this.getTranslation(rotation, 1);
+    return this.getTranslation(rotation, 3);
   }
 
   private getRotation(date: Date): number {
