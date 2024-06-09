@@ -4,23 +4,7 @@ time-input:host {
   align-items: center;
   width: 95%;
   max-width: 95%;
-  display: grid;
-  grid-template-rows: auto;
-
-  // Mobile View
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-areas:
-    "rewind prev-day next-day fforward"
-    "date   date     date     date";
-  row-gap: 8px;
-
-  // Desktop View
-  @media screen and (min-width: 450px) {
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas:
-      "rewind prev-day date next-day fforward";
-    row-gap: 0;
-  }
+  display: flex;
 
   @media screen and (min-width: 700px) {
     width: 80%;
@@ -31,53 +15,28 @@ time-input:host {
     user-select: none;
     justify-self: center;
   }
-}
 
-.time-input__fast-rewind-button,
-.time-input__fast-forward-button {
-  display: none;
-}
-
-.time-input__previous-day-button,
-.time-input__next-day-button {
-  width: 20px;
-  height: 20px;
-
-  mat-icon {
-    margin-top: -21px;
+  button.mat-button {
+    background-color: $button-background;
+    color: $button-color;
+    box-shadow: none;
+    width: 24px;
+    height: 24px;
+  
+    mat-icon {
+      margin-top: -17.5px;
+    }
   }
 }
 
-.time-input__next-day-button mat-icon {
-  margin-left: -1px;
-}
-.time-input__previous-day-button mat-icon {
-  margin-left: -3px;
-}
+.time-input__next-day-button mat-icon { margin-left: -0px; }
+.time-input__previous-day-button mat-icon { margin-left: -2px; }
 
 .time-input__date-picker {
   text-align: center;
   font-size: 2em;
-  min-width: max-content;
+
+  @media screen and (max-width: 350px) {
+    font-size: 1.5em;
+  }
 }
-
-
-// Grid Area Names
-.time-input__fast-rewind-button { grid-area: rewind; }
-.time-input__previous-day-button { grid-area: prev-day; }
-.time-input__date-picker { grid-area: date; }
-.time-input__next-day-button { grid-area: next-day; }
-.time-input__fast-forward-button { grid-area: fforward; }
-
-time-input:host button.mat-button {
-  //background-color: rebeccapurple;
-  background-color: $button-background;
-  color: $button-color;
-  box-shadow: none;
-}
-
-
-// Fix up form field padding
-// ::ng-deep .mat-form-field .mat-form-field-wrapper {
-//   padding-bottom: 0;
-// }
