@@ -11,3 +11,10 @@ root:host {
   justify-content: space-evenly;
   /* font-family: Arial, Helvetica, sans-serif; */
 }
+
+.app__control-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}

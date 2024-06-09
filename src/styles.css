@@ -2,4 +2,5 @@ html, body {
   height: 100%;
   margin: 0;
   background-color: #1D2740 !important;
+  overflow-x: hidden;
 }

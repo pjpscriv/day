@@ -39,7 +39,12 @@ export class ClockComponent implements OnInit, OnDestroy {
 
   public nadirPosition$ = new Observable<any>();
   public solarNoonPosition$ = new Observable<any>();
+  public now$ = new Observable<Date>();
   public nowPosition$ = new Observable<any>();
+  public nowLabelViewBox$ = new Observable<string>();
+  public nowLabelPath$ = new Observable<string>();
+  public nowPathTranslate$ = new Observable<string>();
+  public nowLabelRotate$ = new Observable<string>();
 
   private resize$ = new Subject();
   private destroy$ = new Subject();
@@ -61,7 +66,7 @@ export class ClockComponent implements OnInit, OnDestroy {
 
     const sunTime$: Observable<SunTimesType> = combineLatest([time$, place$]).pipe(
       takeUntil(this.destroy$),
-      map(([time, place]) => this.getSunTimes(time, place)),
+      map(([time, place]) => SunCalc.getTimes(time, place.latitude, place.longitude)),
       tap(sunTimes => this.sunTimes = sunTimes),
     )
 
@@ -108,13 +113,31 @@ export class ClockComponent implements OnInit, OnDestroy {
       map(r => this.getTranslation(r, SUN_MOON_INDENT))
     );
 
+    // Local time label UI
+    this.nowLabelViewBox$ = resize$.pipe(
+      map(_ => this.getRadius() * 2),
+      map(r => `0 0 ${r} ${r}`)
+    );
+    this.nowLabelPath$ = resize$.pipe(
+      map(_ => this.getBorderPath())
+    )
+    this.nowPathTranslate$ = resize$.pipe(
+      map(_ => this.getRadius()),
+      map(r => `translate(${r}, ${r})`)
+    )
 
     // Updates every second
-    this.nowPosition$ = combineLatest([timer(0, 1000 ), resize$]).pipe(
+    this.now$ = combineLatest([timer(0, 1000 ), resize$]).pipe(
       startWith([null, null]),
-      map(([i, _]) => this.getRotation(new Date())),
+      map(([i, _]) => new Date())
+    );
+    this.nowPosition$ = this.now$.pipe(
+      map(d => this.getRotation(d)),
       map(r => this.getTranslation(r, 3))
     );
+    this.nowLabelRotate$ = this.now$.pipe(
+      map(d => `rotate(${this.getRotation(d) - Math.PI}rad)`)
+    )
 
     // Gradient
     sunTime$.subscribe((sunTimes: SunTimesType) => {
@@ -173,24 +196,45 @@ export class ClockComponent implements OnInit, OnDestroy {
     return this.getTranslation(rotation, 3);
   }
 
+  private getBorderPath(): string {
+
+    const r = this.getRadius();
+    
+    // Generate the path string for a circle in a single line
+    const path =
+      `M ${0} ${r}` + 
+      `A ${r} ${r} 0 1 1 ${0} ${-r}` + 
+      `A ${r} ${r} 0 1 1 ${0} ${r}` +
+      `M ${0} ${r}` + 
+      `A ${r} ${r} 0 1 0 ${0} ${-r}` + 
+      `A ${r} ${r} 0 1 0 ${0} ${r}` +
+      `Z`;
+
+    return path;
+  }
+
   private getRotation(date: Date): number {
     return 2 * Math.PI * (getDayMilliseconds(date) / MS_PER_DAY);
   }
 
   private getTranslation(rotation: number, length: number = 6, includeRotation: boolean = true) {
     const dp = 1000;
-
-    const radFromWidth = window.innerWidth * 0.75;
-    const height = Math.max(window.innerHeight, document.documentElement.clientHeight)
-    const radFromHeight = (height - 120) * 0.8;
-    const radius = Math.min(radFromWidth, radFromHeight) * 0.5;
-
+    
+    const radius = this.getRadius();
     const radiusShift = 1 - (length / 75);
 
     const y = Math.round((Math.sin(rotation) * radius * radiusShift) * dp) / dp * -1;
     const x = Math.round((Math.cos(rotation) * radius * radiusShift) * dp) / dp;
 
     return `translate(${y}px, ${x}px) rotate(${includeRotation ? rotation : 0}rad)`;
+  }
+
+  private getRadius(): number {
+    const radFromWidth = window.innerWidth * 0.75;
+    const height = Math.max(window.innerHeight, document.documentElement.clientHeight)
+    const radFromHeight = (height - 120) * 0.8;
+    const radius = Math.min(radFromWidth, radFromHeight) * 0.5;
+    return radius
   }
 
   private getSunTimes(time: Date, place: Place): any {

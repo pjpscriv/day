@@ -3,11 +3,13 @@
   @return m#{i}n(#{$numbers});
 }
 
+
+// Radius
 $radius: min(75vw, calc((100vh - 120px) * 0.8));
 
 
+// Host element
 clock:host {
-  // border: 2px solid white;
   width: $radius;
   height: $radius;
   min-width: $radius;
@@ -15,52 +17,46 @@ clock:host {
   border-radius: 50%;
 
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
 
   background-image: linear-gradient(0rad, #222222 50%, transparent 50%);
+
+  & *:not(.clock__label_text div) {
+    position: absolute;
+  }
 }
 
-.clock__label_text {
-  position: absolute;
-  font-size: 2.2vmin;
-  line-height: 2.4vmin;
-}
 
-.clock__hour,
-.clock__minute {
-  position: absolute;
-  opacity: 1.0;
-  border-radius: 2px;
+// Markings
+.clock__markings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  * {
+    border-radius: 2px;
+    width: 4px;
+  }
 }
 
 .clock__hour {
-  width: 4px;
   height: 4vmin;
   background-color: #FFFFFF66;
 }
 
 .clock__minute {
-  width: 4px;
   height: 2vmin;
   background-color: #FFFFFF33;
 }
 
-.clock__time {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  border-radius: 30px;
-  filter: blur(1px);
-}
 
-.clock__time-now {
-  width: 18px;
-  height: 18px;
-  background-color: #FF4040;
-  z-index: 100;
-  filter: none;
+// Icons
+.clock__time {
+  width: 4vmin;
+  height: 4vmin;
+  border-radius: 30px;
+  filter: blur(2px);
 }
 
 .clock__time-solar-noon {
@@ -70,4 +66,34 @@ clock:host {
 .clock__time-nadir {
   background-color: #eeeeee;
   box-shadow: 0 0 4px #333333;
+}
+
+.clock__time-now {
+  width: 2vmin;
+  height: 2vmin;
+  background-color: #FF4040;
+  z-index: 100;
+  filter: none;
+}
+
+
+// Labels
+.clock__label_text {
+  font-size: 2.2vmin;
+  line-height: 2.4vmin;
+}
+
+
+// Local time
+.clock__local-time {
+  font-size: 1.5vmin;
+  overflow: visible;
+  width: calc($radius + 4px);
+  height: calc($radius + 4px);
+
+  // path {
+  //   stroke: #FF4040;
+  //   stroke-width: 4;
+  //   stroke-dasharray: 20;
+  // }
 }

@@ -1,23 +1,14 @@
-<p class="clock__label_text"
-  [style.transform]="sunrisePosition$ | async">
-  {{ sunrise$ | async }}<br/>Sunrise</p>
-<p class="clock__label_text"
-  [style.transform]="sunsetPosition$ | async">
-  {{ sunset$ | async }}<br/>Sunset</p>
-<p class="clock__label_text"
-  [style.transform]="solarNoonLabelPosition$ | async">
-  {{ solarNoon$ | async }}<br/>Solar Noon</p>
-<p class="clock__label_text"
-  [style.transform]="nadirLabelPosition$ | async">
-  {{ nadir$ | async }}<br/>Midnight</p>
+<!-- Clock Markings -->
+<div class="clock__markings">
+  <div class="clock__hour"
+    *ngFor="let hourNum of hoursList"
+    [style.transform]="getHourPosition(hourNum)"></div>
+  <div class="clock__minute"
+    *ngFor="let minute of minutes"
+    [style.transform]="getMinutePosition(minute)"></div>
+</div>
 
-<div class="clock__hour"
-  *ngFor="let hourNum of hoursList"
-  [style.transform]="getHourPosition(hourNum)"></div>
-<div class="clock__minute"
-  *ngFor="let minute of minutes"
-  [style.transform]="getMinutePosition(minute)"></div>
-
+<!-- Icons -->
 <div class="clock__time clock__time-now"
   (window:resize)="onResize($event)"
   [style.transform]="nowPosition$ | async"></div>
@@ -25,3 +16,34 @@
   [style.transform]="solarNoonPosition$ | async"></div>
 <div class="clock__time clock__time-nadir"
   [style.transform]="nadirPosition$ | async"></div>
+
+  <!-- Labels -->
+<div class="clock__label_text" [style.transform]="sunrisePosition$ | async">
+  <div>{{ sunrise$ | async }}</div>
+  <div>Sunrise</div>
+</div>
+<div class="clock__label_text" [style.transform]="sunsetPosition$ | async">
+  <div>{{ sunset$ | async }}</div>
+  <div>Sunset</div>
+</div>
+<div class="clock__label_text" [style.transform]="solarNoonLabelPosition$ | async">
+  <div>{{ solarNoon$ | async }}</div>
+  <div>Solar Noon</div>
+</div>
+<div class="clock__label_text" [style.transform]="nadirLabelPosition$ | async">
+  <div>{{ nadir$ | async }}</div>
+  <div>Midnight</div>
+</div>
+
+<!-- Local time -->
+<svg class="clock__local-time" [attr.viewBox]="nowLabelViewBox$ | async"
+  [style.transform]="nowLabelRotate$ | async">
+  <path id="localTimeLabel" 
+    [attr.d]="nowLabelPath$ | async"
+    [attr.transform]="nowPathTranslate$ | async"></path>
+  <text>
+    <textPath href="#localTimeLabel" text-anchor="middle" alignment-baseline="auto" startOffset="25%" fill="white">
+      {{ (now$ | async) | date:'shortTime' }} LOCAL TIME
+    </textPath>
+  </text>
+</svg>
