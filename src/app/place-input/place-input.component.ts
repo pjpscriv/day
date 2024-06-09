@@ -10,7 +10,7 @@ import {
   UpdateTimeAction
 } from '../state/day.actions';
 import { selectPlace, selectSuggestedLocations } from '../state/day.selectors';
-import { Place, Wellington } from '../types/place.type';
+import { Place, Wellington, DefaultPlace } from '../types/place.type';
 
 
 @Component({
@@ -31,16 +31,13 @@ export class PlaceInputComponent implements OnInit {
   constructor(
     private store: Store
   ) {
-    this.place = Wellington;
-    // this.textInputFormControl.setValue(this.place.name);
-
-    this.place$ = this.store.select(selectPlace) as Observable<Place>;
+    this.place = DefaultPlace;
+    this.place$ = this.store.select(selectPlace).pipe(
+      tap(p => console.log(`New place!:`, p))
+    );
   }
 
-  ngOnInit(): void {
-    this.place = this.copyPlace(Wellington);
-    this.store.dispatch(UpdatePlaceAction({ place: this.place }))
-
+  public ngOnInit(): void {
     this.setToStartingPosition();
 
     // Send API Query
@@ -82,7 +79,10 @@ export class PlaceInputComponent implements OnInit {
       this.store.dispatch(ClearSuggestionsAction());
     },
       (error) => {
-        console.log('Position not given', error.message)
+        console.log('Position not given', error.message);
+        this.place = Wellington; 
+        this.store.dispatch(UpdatePlaceAction({ place: this.place }));
+        this.store.dispatch(ClearSuggestionsAction());
       }
     );
   }

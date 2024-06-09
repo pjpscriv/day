@@ -29,6 +29,7 @@
 
     <!-- Place Name Input -->
     <ng-template #nameInput>
+
       <mat-form-field class="place-input__name-input" appearance="outline">
         <input
           matInput
@@ -36,8 +37,8 @@
           [value]="place.name"
           [matAutocomplete]="auto"
           [formControl]="textInputFormControl">
-        <!-- <mat-icon matSuffix>pin_drop</mat-icon> -->
-        <mat-autocomplete #auto="matAutocomplete"
+        <mat-autocomplete
+          #auto="matAutocomplete"
           (optionSelected)="onLocationSelected($event)"
           [displayWith]="getDescription">
           <mat-option *ngFor="let option of autocompletePlaces$ | async" [value]="option">
@@ -45,6 +46,7 @@
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
+
     </ng-template>
 
 </div>

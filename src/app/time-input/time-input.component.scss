@@ -3,7 +3,7 @@
 time-input:host {
   align-items: center;
   width: 95%;
-  max-width: 95%;
+  max-width: 70vw;
   display: flex;
 
   @media screen and (min-width: 700px) {
@@ -32,11 +32,27 @@ time-input:host {
 .time-input__next-day-button mat-icon { margin-left: -0px; }
 .time-input__previous-day-button mat-icon { margin-left: -2px; }
 
-.time-input__date-picker {
+.time-input__date-picker input {
+  background-color: transparent;
+  border: none;
+  color: white;
   text-align: center;
   font-size: 2em;
+  outline: none;
+  max-width: 70vw;
+
+  &:focus-visible {
+    border: none;
+  }
 
   @media screen and (max-width: 350px) {
     font-size: 1.5em;
   }
+}
+
+::ng-deep .mat-datepicker-popup mat-datepicker-content.mat-datepicker-content {
+  border-radius: 20px;
+  background-color: #1D2740CC;
+  backdrop-filter: blur(10px);
+  border: #FFFFFF66 solid 2px;
 }

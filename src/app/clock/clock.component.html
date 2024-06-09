@@ -43,7 +43,14 @@
     [attr.transform]="nowPathTranslate$ | async"></path>
   <text>
     <textPath href="#localTimeLabel" text-anchor="middle" alignment-baseline="auto" startOffset="25%" fill="white">
-      {{ (now$ | async) | date:'shortTime' }} LOCAL TIME
+      {{ (now$ | async) | date:'h:mm:ssa' | lowercase }} LOCAL TIME
     </textPath>
   </text>
 </svg>
+
+<!-- Background -->
+<div class="clock__day-segment"
+  [style.maskImage]="(gradient$ | async)"
+  [style.maskComposite]="maskMode$ | async">
+</div>
+<div class="clock__night-segment"></div>

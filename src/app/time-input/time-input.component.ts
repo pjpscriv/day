@@ -32,6 +32,7 @@ export class TimeInputComponent implements OnInit, OnDestroy {
       filter((time: Date) => time != this.time),
       takeUntil(this.destroyed$)
     ).subscribe((time: Date) => {
+      this.stopTimeWarp()
       this.time = time;
     })
   }
@@ -42,7 +43,7 @@ export class TimeInputComponent implements OnInit, OnDestroy {
 
   public onDateChange(event: MatDatepickerInputEvent<any, any>): void {
     if (!!event.value) {
-      this.time = event.value;
+      this.time = event.value.toDate();
       this.store.dispatch(UpdateTimeAction({ time: this.time }));
     }
   }
@@ -80,10 +81,12 @@ export class TimeInputComponent implements OnInit, OnDestroy {
   }
 
   public timeWarpForwards(interval: number): void {
+    this.stopTimeWarp();
     this.repeater = setInterval(() => this.nextDay(), interval);
   }
 
   public timeWarpBackwards(interval: number): void {
+    this.stopTimeWarp();
     this.repeater = setInterval((interval: number) => this.previousDay(), interval);
   }
 

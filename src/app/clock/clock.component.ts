@@ -6,16 +6,14 @@ import { MS_PER_DAY, NUMBER_OF_HOURS } from '../day.consts';
 import { getDayMilliseconds } from '../day.helpers';
 import { selectPlace, selectTime } from '../state/day.selectors';
 import { Place } from '../types/place.type';
-import { startingTime, SunTimesType } from '../types/sunTimes.type';
+import { SunTimesType } from '../types/sunTimes.type';
 
 declare var SunCalc: any;
 
 // TODO: Move to constants file
-const DAY_COLOR   = "#5198C2";
-const NIGHT_COLOR = "#222222";
 const NUMBER_OF_MINUTES = NUMBER_OF_HOURS * 6;
 const SUN_MOON_INDENT = 13;
-const LABEL_INDENT = 22;
+const LABEL_INDENT = 25;
 
 @Component({
   selector: 'clock',
@@ -25,7 +23,6 @@ const LABEL_INDENT = 22;
 export class ClockComponent implements OnInit, OnDestroy {
   public hoursList = Array(NUMBER_OF_HOURS).fill(0).map((_, i) => i);
   public minutes = Array(NUMBER_OF_MINUTES).fill(0).map((_, i) => i).filter(v => v % 6 != 0)
-  public sunTimes: SunTimesType = startingTime;
 
   public sunrise$ = new Observable<string>();
   public sunset$ = new Observable<string>();
@@ -46,28 +43,27 @@ export class ClockComponent implements OnInit, OnDestroy {
   public nowPathTranslate$ = new Observable<string>();
   public nowLabelRotate$ = new Observable<string>();
 
+  public gradient$ = new Observable<any>();
+  public maskMode$ = new Observable<string>();
+
   private resize$ = new Subject();
-  private destroy$ = new Subject();
+  private destroy$ = new Subject<void>();
 
   constructor(
     private elRef: ElementRef,
     private datePipe: DatePipe,
     private store: Store
-  ) {
-    // this.place = Wellington;
-    this.elRef.nativeElement.style.backgroundColour = DAY_COLOR;
-  }
+  ) {}
 
   public ngOnInit(): void {
 
     // Inputs
-    const time$ = this.store.select(selectTime) as Observable<Date>;
-    const place$ = this.store.select(selectPlace) as Observable<Place>;
+    const time$ = this.store.select(selectTime);
+    const place$ = this.store.select(selectPlace);
 
     const sunTime$: Observable<SunTimesType> = combineLatest([time$, place$]).pipe(
-      takeUntil(this.destroy$),
-      map(([time, place]) => SunCalc.getTimes(time, place.latitude, place.longitude)),
-      tap(sunTimes => this.sunTimes = sunTimes),
+      map(([time, place]: [Date, Place]) => SunCalc.getTimes(time, place.latitude, place.longitude)),
+      takeUntil(this.destroy$)
     )
 
     const resize$ = this.resize$.pipe(startWith(null));
@@ -94,7 +90,7 @@ export class ClockComponent implements OnInit, OnDestroy {
     )
     this.solarNoonLabelPosition$ = combineLatest([sunTime$, resize$]).pipe(
       map(([st, _]) => !!st?.solarNoon ? this.getRotation(st.solarNoon) : Math.PI),
-      map(r => this.getTranslation(r, LABEL_INDENT + 5, false))
+      map(r => this.getTranslation(r, LABEL_INDENT, false))
     );
     this.solarNoonPosition$ = combineLatest([sunTime$, resize$]).pipe(
       map(([st, _]) => !!st?.solarNoon ? this.getRotation(st.solarNoon) : Math.PI),
@@ -140,30 +136,29 @@ export class ClockComponent implements OnInit, OnDestroy {
     )
 
     // Gradient
-    sunTime$.subscribe((sunTimes: SunTimesType) => {
-      let gradient = `linear-gradient(0rad, ${NIGHT_COLOR} 50%, ${NIGHT_COLOR} 50%)`;
-      let bgColor = NIGHT_COLOR;
+    this.gradient$ = sunTime$.pipe(map((sunTimes: SunTimesType) => {
+      const DAY = "white";
+      const NIGHT = "black";
 
-      if (this.hasSunriseAndSunset(sunTimes)) {
-        let sunriseAngle = this.getAngle(sunTimes.sunrise as Date);
-        let sunsetAngle  = this.getAngle(sunTimes.sunset as Date);
-        let dayLongerThanNight = this.dayLongerThanNight(sunTimes);
-        gradient = this.getGradient(sunriseAngle, sunsetAngle, dayLongerThanNight);
-        bgColor = dayLongerThanNight ? NIGHT_COLOR : DAY_COLOR;
-
-      } else {
-        if (sunTimes.night === null) {
-          gradient = `linear-gradient(0rad, ${DAY_COLOR} 50%, ${DAY_COLOR} 50%)`;
-        }
+      if (!this.hasSunriseAndSunset(sunTimes)) {
+        return (sunTimes.night === null) ? DAY : NIGHT;
       }
 
-      this.elRef.nativeElement.style.backgroundImage = gradient;
-      this.elRef.nativeElement.style.backgroundColor = bgColor;
+      let sunriseAngle = this.getAngle(sunTimes.sunrise as Date);
+      let sunsetAngle  = this.getAngle(sunTimes.sunset as Date);
+      let dayLong = this.dayLongerThanNight(sunTimes);
+      let gradient = this.getGradient(sunriseAngle, sunsetAngle, dayLong)
 
+      // TODO: Check if this still needed?
       // Tomorrow's nadir for nice Daylight Savings behaviour
       // this.addTime(new Date(this.sunTimes.nadir.getTime() + MS_PER_DAY), 'nadir');
-    })
 
+      return gradient;
+    }));
+
+    this.maskMode$ = sunTime$.pipe(
+      map(st => this.dayLongerThanNight(st) ? 'add' : 'subtract')
+    );
   }
 
   public onResize(event: any): void {
@@ -179,11 +174,11 @@ export class ClockComponent implements OnInit, OnDestroy {
     return (sunTimes.sunset - sunTimes.sunrise) > (MS_PER_DAY / 2);
   }
 
-  public getGradient(sunriseAngle: any, sunsetAngle: any, isDay: boolean): string {
-    const colour1 : string = isDay ? 'transparent' : NIGHT_COLOR;
-    const colour2 : string = isDay ? DAY_COLOR : 'transparent';
-    return `linear-gradient(${sunriseAngle}rad, ${colour1} 50%, ${colour2} 50%),
-            linear-gradient(${sunsetAngle}rad, ${colour2} 50%, ${colour1} 50%)`;
+  public getGradient(sunriseAngle: any, sunsetAngle: any, dayLong: boolean): string {
+    const transp = 'transparent';
+    const fill = "white";
+    return `linear-gradient(${sunriseAngle}rad, ${transp} 50%, ${fill} 50%),
+            linear-gradient(${sunsetAngle}rad, ${!dayLong ? transp : fill} 50%, ${!dayLong ? fill : transp} 50%)`;
   }
 
   public getHourPosition(hour?: number): any {
@@ -237,10 +232,6 @@ export class ClockComponent implements OnInit, OnDestroy {
     return radius
   }
 
-  private getSunTimes(time: Date, place: Place): any {
-    return SunCalc.getTimes(time, place.latitude, place.longitude);
-  }
-
   private getAngle(date: Date): number {
     let ms = getDayMilliseconds(date);
     let circle_percent = ms / MS_PER_DAY;
@@ -248,6 +239,6 @@ export class ClockComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.destroy$.next(null);
+    this.destroy$.next();
   }
 }

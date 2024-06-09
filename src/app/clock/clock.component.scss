@@ -20,13 +20,14 @@ clock:host {
   justify-content: center;
   align-items: center;
 
-  background-image: linear-gradient(0rad, #222222 50%, transparent 50%);
-
   & *:not(.clock__label_text div) {
     position: absolute;
   }
 }
 
+clock:host * {
+  z-index: 10;
+}
 
 // Markings
 .clock__markings {
@@ -71,7 +72,7 @@ clock:host {
 .clock__time-now {
   width: 2vmin;
   height: 2vmin;
-  background-color: #FF4040;
+  background-color: #FF6B6B;
   z-index: 100;
   filter: none;
 }
@@ -88,12 +89,33 @@ clock:host {
 .clock__local-time {
   font-size: 1.5vmin;
   overflow: visible;
-  width: calc($radius + 4px);
-  height: calc($radius + 4px);
+  width: calc($radius + 16px);
+  height: calc($radius + 16px);
 
+  // Uncomment to show SVG path
   // path {
   //   stroke: #FF4040;
   //   stroke-width: 4;
   //   stroke-dasharray: 20;
   // }
+}
+
+
+// Background
+clock:host .clock__day-segment {
+  background-image: radial-gradient(#82BCE6, #5198C2);
+  z-index: 5;
+
+  width: $radius;
+  height: $radius;
+  z-index: 5;
+  border-radius: $radius;
+}
+
+clock:host .clock__night-segment {
+  width: calc($radius - 1px);
+  height: calc($radius - 1px);
+  border-radius: $radius;
+  z-index: 2;
+  background-image: radial-gradient(#05090F 18%, #12233D 87%);
 }
