@@ -5,27 +5,9 @@
   <mat-icon *ngIf="!showLatLongInput">signpost</mat-icon>
 </button>
 
-<div *ngIf="place$ | async as place" class="place-input__container">
+<div class="place-input__spacer-1"></div>
 
-    <!-- Latitude / Longitude Input -->
-    <ng-container *ngIf="showLatLongInput; else nameInput">
-      <mat-form-field appearance="outline" class="place-input__lat-long-input">
-        <mat-label>Lat</mat-label>
-        <input min="-90" max="90"
-          matInput
-          type="number"
-          [value]="place.latitude | number:'1.1-4'"
-          (change)="onLatChange($event)">
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="place-input__lat-long-input">
-        <mat-label>Long</mat-label>
-        <input min="-180" max="180"
-          matInput
-          type="number"
-          [value]="place.longitude | number:'1.1-4'"
-          (change)="onLongChange($event)">
-      </mat-form-field>
-    </ng-container>
+<div *ngIf="place$ | async as place" class="place-input__container">
 
     <!-- Place Name Input -->
     <ng-template #nameInput>
@@ -49,7 +31,29 @@
 
     </ng-template>
 
+    <!-- Latitude / Longitude Input -->
+    <ng-container *ngIf="showLatLongInput; else nameInput">
+      <mat-form-field appearance="outline" class="place-input__lat-long-input">
+        <mat-label>Lat</mat-label>
+        <input min="-90" max="90"
+          matInput
+          type="number"
+          [value]="place.latitude | number:'1.1-4'"
+          (change)="onLatChange($event)">
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="place-input__lat-long-input">
+        <mat-label>Long</mat-label>
+        <input min="-180" max="180"
+          matInput
+          type="number"
+          [value]="place.longitude | number:'1.1-4'"
+          (change)="onLongChange($event)">
+      </mat-form-field>
+    </ng-container>
+
 </div>
+
+<div class="place-input__spacer-2"></div>
 
 <button mat-button mat-mini-fab
   class="place-input__reset-button"

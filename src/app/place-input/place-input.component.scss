@@ -3,36 +3,30 @@
 place-input:host {
   align-items: center;
   display: grid;
-  width: 80%;
+  width: 90%;
   grid-template-rows: auto;
 
-  // Mobile View
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas:
-    "input input"
-    "reset switcher";
-  row-gap: 8px;
+  grid-template-columns: 1fr auto 4fr auto 1fr;
+  grid-template-areas: "switcher spacer-1 input spacer-2 reset";
+  row-gap: 0;
 
-  // Desktop View
-  @media screen and (min-width: 450px) {
-    grid-template-columns: 1fr 4fr 1fr;
-    grid-template-areas:
-      "switcher input reset";
-    row-gap: 0;
-  }
 
   * {
     cursor: pointer;
     user-select: none;
     justify-self: center;
   }
-}
 
-.place-input__reset-button {
-  background-color: $button-background;
-  color: $button-color;
-  grid-area: reset;
-  box-shadow: none;  
+  button.mat-button {
+    background-color: transparent;
+    color: $button-color;
+    box-shadow: none !important; // oof
+
+    mat-icon {
+      background-color: $button-background;
+      border-radius: 20px;
+    }
+  }
 }
 
 .place-input__container {
@@ -57,6 +51,20 @@ place-input:host {
   grid-area: switcher;
 }
 
+.place-input__reset-button {
+  background-color: $button-background;
+  color: $button-color;
+  grid-area: reset;
+  box-shadow: none;  
+}
+
+.place-input__spacer-1 {
+  grid-area: spacer-1;
+}
+
+.place-input__spacer-2 {
+  grid-area: spacer-2;
+}
 
 // Fix up form field padding
 ::ng-deep .mat-form-field .mat-form-field-wrapper {

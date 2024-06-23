@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { Store } from '@ngrx/store';
 import { MS_PER_DAY } from '../day.consts';
@@ -15,6 +15,8 @@ export const TIMEWARP_INTERVAL = 20;
   styleUrls: ['./time-input.component.scss']
 })
 export class TimeInputComponent implements OnInit, OnDestroy {
+  @ViewChild('timeInput')
+  public timeInput!: ElementRef<HTMLInputElement>;
   public time: Date;
 
   private timeWarpHoldActive: boolean = false;
@@ -41,9 +43,13 @@ export class TimeInputComponent implements OnInit, OnDestroy {
     this.store.dispatch(UpdateTimeAction({ time: this.time }));
   }
 
-  public onDateChange(event: MatDatepickerInputEvent<any, any>): void {
-    if (!!event.value) {
-      this.time = event.value.toDate();
+  public onFocus(): void {
+    this.timeInput.nativeElement.blur();
+  }
+
+  public onDateChange($event: MatDatepickerInputEvent<any, any>): void {
+    if (!!$event.value) {
+      this.time = $event.value.toDate();
       this.store.dispatch(UpdateTimeAction({ time: this.time }));
     }
   }
@@ -58,7 +64,8 @@ export class TimeInputComponent implements OnInit, OnDestroy {
     this.store.dispatch(UpdateTimeAction({ time: this.time }));
   }
 
-  public nextDayThenTimeWarp(): void {
+  public nextDayThenTimeWarp($event: Event): void {
+    $event.preventDefault();
     this.nextDay();
     this.timeWarpHoldActive = true;
     
@@ -69,7 +76,7 @@ export class TimeInputComponent implements OnInit, OnDestroy {
     }, TIMEWARP_HOLD_DELAY)
   } 
 
-  public previousDayThenTimeWarp(): void {
+  public previousDayThenTimeWarp($event: Event): void {
     this.previousDay();
     this.timeWarpHoldActive = true;
     
@@ -87,7 +94,7 @@ export class TimeInputComponent implements OnInit, OnDestroy {
 
   public timeWarpBackwards(interval: number): void {
     this.stopTimeWarp();
-    this.repeater = setInterval((interval: number) => this.previousDay(), interval);
+    this.repeater = setInterval(() => this.previousDay(), interval);
   }
 
   public stopTimeWarp(): void {

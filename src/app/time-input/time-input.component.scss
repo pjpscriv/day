@@ -1,13 +1,12 @@
 @import '../shared.styles.scss';
 
 time-input:host {
-  align-items: center;
-  width: 95%;
-  max-width: 70vw;
   display: flex;
+  justify-content: center;
+  align-items: center;
 
   @media screen and (min-width: 700px) {
-    width: 80%;
+
   }
 
   * {
@@ -17,20 +16,20 @@ time-input:host {
   }
 
   button.mat-button {
-    background-color: $button-background;
+    background-color: transparent;
     color: $button-color;
-    box-shadow: none;
-    width: 24px;
-    height: 24px;
-  
+    box-shadow: none !important; // oof
+
     mat-icon {
-      margin-top: -17.5px;
+      background-color: $button-background;
+      border-radius: 20px;
     }
   }
 }
 
 .time-input__next-day-button mat-icon { margin-left: -0px; }
 .time-input__previous-day-button mat-icon { margin-left: -2px; }
+
 
 .time-input__date-picker input {
   background-color: transparent;
@@ -39,13 +38,14 @@ time-input:host {
   text-align: center;
   font-size: 2em;
   outline: none;
-  max-width: 70vw;
+  max-width: 255px;
+  width: 60vw;
 
   &:focus-visible {
     border: none;
   }
 
-  @media screen and (max-width: 350px) {
+  @media screen and (max-width: 400px) {
     font-size: 1.5em;
   }
 }
