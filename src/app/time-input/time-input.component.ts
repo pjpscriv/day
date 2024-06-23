@@ -77,6 +77,7 @@ export class TimeInputComponent implements OnInit, OnDestroy {
   } 
 
   public previousDayThenTimeWarp($event: Event): void {
+    $event.preventDefault();
     this.previousDay();
     this.timeWarpHoldActive = true;
     
