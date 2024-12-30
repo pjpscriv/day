@@ -53,6 +53,12 @@ clock:host * {
 
 
 // Icons
+.clock__time-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .clock__time {
   width: 4vmin;
   height: 4vmin;
@@ -82,6 +88,7 @@ clock:host * {
 .clock__label_text {
   font-size: 2.2vmin;
   line-height: 2.4vmin;
+  text-wrap-mode: nowrap;
 }
 
 

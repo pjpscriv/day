@@ -1,33 +1,47 @@
-export type SunTimesType = {
-  dawn: Date | null,
-  dusk: Date | null,
-  goldenHour: Date | null,
-  goldenHourEnd: Date | null,
-  nadir: Date | null,
-  nauticalDawn: Date | null,
-  nauticalDusk: Date | null,
-  night: Date | null,
-  nightEnd: Date | null,
-  solarNoon: Date | null,
-  sunrise: Date | null,
-  sunriseEnd: Date | null,
-  sunset: Date | null,
-  sunsetStart: Date | null,
-}
+import { MS_PER_DAY } from "../day.consts";
+import * as SunCalc from "suncalc";
+
+export type SunTimesType = SunCalc.GetTimesResult;
 
 export const startingTime: SunTimesType = {
-  dawn: null,
-  dusk: null,
-  goldenHour: null,
-  goldenHourEnd: null,
-  nadir: null,
-  nauticalDawn: null,
-  nauticalDusk: null,
-  night: null,
-  nightEnd: null,
-  solarNoon: null,
-  sunrise: null,
-  sunriseEnd: null,
-  sunset: null,
-  sunsetStart: null,
+  dawn: new Date(NaN),
+  dusk: new Date(NaN),
+  goldenHour: new Date(NaN),
+  goldenHourEnd: new Date(NaN),
+  nadir: new Date(NaN),
+  nauticalDawn: new Date(NaN),
+  nauticalDusk: new Date(NaN),
+  night: new Date(NaN),
+  nightEnd: new Date(NaN),
+  solarNoon: new Date(NaN),
+  sunrise: new Date(NaN),
+  sunriseEnd: new Date(NaN),
+  sunset: new Date(NaN),
+  sunsetStart: new Date(NaN),
 };
+
+export type SunTimeDisplayData = {
+  time: Date | null,
+  position: string
+}
+
+export type SunTimeDisplayDataWithIcon = {
+  time: Date,
+  position: string,
+  dotPosition: string
+}
+
+export type SunTimesDisplayData = {
+  sunrise: SunTimeDisplayData,
+  sunset: SunTimeDisplayData,
+  solarNoon: SunTimeDisplayDataWithIcon,
+  nadir: SunTimeDisplayDataWithIcon
+}
+
+export function hasSunriseAndSunset(sunTimes: SunTimesType): boolean {
+  return !isNaN(sunTimes.sunrise?.getTime()) && !isNaN(sunTimes.sunset.getTime());
+}
+
+export function dayLongerThanNight(sunTimes: SunTimesType): boolean {
+  return (sunTimes.sunset.getTime() - sunTimes.sunrise.getTime()) > (MS_PER_DAY / 2);
+}
