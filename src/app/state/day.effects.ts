@@ -32,26 +32,7 @@ export class DayEffects {
 
     public getCoordinatesFromApi$ = createEffect(() => this.actions$.pipe(
         ofType(GetCoordinatesFromApiAction),
-        switchMap((action) => {
-            const thing$ = this.mapsService.getLocationInformation(action.placeId)
-
-            return thing$;
-        }
-
-
-
-        //.pipe(
-        //     tap(x => {
-        //         let thing = x;
-        //         console.log(`RESP: ${x}`)
-        //     }),
-        //     map((result) => GetCoordinatesFromApiSuccessAction(result)),
-        //     catchError(error => of(GetCoordinatesFromApiFailureAction({ errorMessage: error })))
-        // )
-        ),
-        tap(x => {
-            console.log(`RESP 2: ${x}`);
-        }),
+        switchMap((action) => this.mapsService.getLocationInformation(action.placeId)),
         map(([result, status]) => GetCoordinatesFromApiSuccessAction({ response: result })),
         catchError(error => of(GetSuggestionsFromApiFailureAction({ errorMessage: error })))
     ));

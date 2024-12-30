@@ -20,11 +20,11 @@ import { Place, Wellington, DefaultPlace } from '../types/place.type';
 })
 export class PlaceInputComponent implements OnInit {
   private place: Place;
+  private oldValue: string = '';
   public value: string = '';
   public autocompletePlaces$ = new Observable<any[]>();
   public showLatLongInput = false;
   public textInputFormControl = new FormControl();
-  public displayAutocomplete = true;
 
   public place$: Observable<Place>;
 
@@ -32,9 +32,7 @@ export class PlaceInputComponent implements OnInit {
     private store: Store
   ) {
     this.place = DefaultPlace;
-    this.place$ = this.store.select(selectPlace).pipe(
-      tap(p => console.log(`New place!:`, p))
-    );
+    this.place$ = this.store.select(selectPlace);
   }
 
   public ngOnInit(): void {
@@ -42,10 +40,11 @@ export class PlaceInputComponent implements OnInit {
 
     // Send API Query
     this.textInputFormControl.valueChanges.pipe(
-      filter(value => !!value),
-      debounceTime(200),
-      tap(value => this.store.dispatch(GetSuggestionsFromApiAction({ searchTerm: value})))
-    ).subscribe();
+      filter(value => !!value && typeof value === 'string'),
+      debounceTime(200)
+    ).subscribe(searchTerm => {
+      this.store.dispatch(GetSuggestionsFromApiAction({ searchTerm }))
+  });
 
     this.autocompletePlaces$ = merge(
       this.textInputFormControl.valueChanges,
@@ -62,7 +61,6 @@ export class PlaceInputComponent implements OnInit {
       console.log("Your browser is too old to share your location :'(");
       this.place = Wellington;
       this.store.dispatch(UpdatePlaceAction({ place: this.place }))
-
       return;
     }
 
@@ -73,7 +71,8 @@ export class PlaceInputComponent implements OnInit {
       this.place = {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
-        name: 'Your location'
+        name: 'Your location',
+        utcOffset: new Date().getTimezoneOffset() * -1
       }
       this.store.dispatch(UpdatePlaceAction({ place: this.place }))
       this.store.dispatch(ClearSuggestionsAction());
@@ -113,6 +112,7 @@ export class PlaceInputComponent implements OnInit {
 
   public onLocationSelected(event: any): void {
     const thing = event.option.value;
+    this.oldValue = '';
     this.store.dispatch(GetCoordinatesFromApiAction({ placeId: thing.place_id }))
   }
 
@@ -125,11 +125,16 @@ export class PlaceInputComponent implements OnInit {
     return option?.description;
   }
 
-  private copyPlace(place: Place): Place {
-    return {
-      latitude: place.latitude,
-      longitude: place.longitude,
-      name: place.name
-    }
+  public onFocus(): void {
+    this.oldValue = this.textInputFormControl.value;
+    this.textInputFormControl.setValue('');
+  }
+
+  public onBlur(): void {
+    setTimeout(() => {
+      if (!!this.oldValue) {
+        this.textInputFormControl.setValue(this.oldValue);
+      }
+    }, 100);
   }
 }

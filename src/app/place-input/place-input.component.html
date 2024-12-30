@@ -18,7 +18,9 @@
           type="text"
           [value]="place.name"
           [matAutocomplete]="auto"
-          [formControl]="textInputFormControl">
+          [formControl]="textInputFormControl"
+          (focus)="onFocus()"
+          (blur)="onBlur()">
         <mat-autocomplete
           #auto="matAutocomplete"
           (optionSelected)="onLocationSelected($event)"

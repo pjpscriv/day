@@ -5,7 +5,7 @@ import { MS_PER_DAY, NUMBER_OF_HOURS } from '../day.consts';
 import { getDayMilliseconds } from '../day.helpers';
 import { selectPlace, selectTime } from '../state/day.selectors';
 import { Place } from '../types/place.type';
-import { hasSunriseAndSunset, dayLongerThanNight, SunTimesType, SunTimesDisplayData } from '../types/sunTimes.type';
+import { hasSunriseAndSunset, dayLongerThanNight, SunTimesType, SunTimesDisplayData, convertToPlaceTimes } from '../types/sunTimes.type';
 import * as SunCalc from 'suncalc';
 import { TimeDisplay } from '../types/timeDisplay.type';
 
@@ -41,16 +41,22 @@ export class ClockComponent implements OnInit, OnDestroy {
     const time$ = this.store.select(selectTime);
     const place$ = this.store.select(selectPlace);
     const sunTime$ = combineLatest([time$, place$]).pipe(
-      map(([time, place]: [Date, Place]) => SunCalc.getTimes(time, place.latitude, place.longitude)),
+      map(([time, place]: [Date, Place]) => [SunCalc.getTimes(time, place.latitude, place.longitude), place] as [SunTimesType, Place]),
+      map(([sunTimes, place]: [SunTimesType, Place]) => convertToPlaceTimes(sunTimes, place)),
       takeUntil(this.destroy$)
     )
     const resize$ = this.resize$.pipe(startWith(null));
-    const seconds$ = timer(0, 1000).pipe(map(_ => new Date()));
+    const seconds$ = combineLatest([timer(0, 1000), place$]).pipe(
+      map(([_, place]) => {
+        let offset = place.utcOffset - (new Date().getTimezoneOffset() * -1);
+        return new Date(new Date().getTime() + (offset * 60 * 1000));
+      }));
 
     // Outputs
     this.displayData$ = combineLatest([sunTime$, resize$]).pipe(
       map(([st, _]) => this.getDisplayData(st))
     );
+    // TODO: Combine these into a single observable
     this.gradient$ = sunTime$.pipe(
       map(st => this.getGradient(st))
     );
@@ -73,11 +79,11 @@ export class ClockComponent implements OnInit, OnDestroy {
     return {
       sunrise: {
         time: sunrise,
-        position: this.getTranslation(sunrise ? this.getRotation(sunrise) : 0, 20, false), 
+        position: this.getTranslation(sunrise ? this.getRotation(sunrise) : 0, sunrise ? 20 : 50, false), 
       },
       sunset: {
         time: sunset,
-        position: this.getTranslation(sunset ? this.getRotation(sunset) : Math.PI, 20, false), 
+        position: this.getTranslation(sunset ? this.getRotation(sunset) : Math.PI, sunset ? 20 : 50, false), 
       },
       solarNoon: {
         time: solarNoon,

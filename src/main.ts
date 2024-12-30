@@ -10,7 +10,7 @@ if (environment.production) {
 }
 
 const scriptTag = document.createElement('script');
-scriptTag.src = `https://maps.googleapis.com/maps/api/js?key=${KEY}&libraries=places`;
+scriptTag.src = `https://maps.googleapis.com/maps/api/js?key=${KEY}&libraries=places&loading=async`;
 scriptTag.async = true;
 document.head.appendChild(scriptTag);
 

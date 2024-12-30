@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { bindCallback, Observable, of, throwError } from 'rxjs';
+import { bindCallback, Observable, of } from 'rxjs';
 
 declare let google: any;
 
@@ -30,7 +30,6 @@ export class GoogleMapsService {
     if (!this.dependanciesReady())
       return of(null);
 
-    console.log(`Get Recs: ${text}`);
     return this.getRecsFunc({ input: text });
   }
 
@@ -38,8 +37,7 @@ export class GoogleMapsService {
     if (!this.dependanciesReady())
       return of(null);
 
-    console.log(`Get Deets: ${placeId}`)
-    return this.getLocFunc({ placeId: placeId, fields: ['name', 'geometry'] })
+    return this.getLocFunc({ placeId: placeId, fields: ['name', 'geometry', 'utc_offset_minutes' ] })
   }
 
   private dependanciesReady(): boolean {

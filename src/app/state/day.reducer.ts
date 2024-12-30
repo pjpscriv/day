@@ -31,7 +31,12 @@ export const placeReducer = createReducer(
     initialState.place,
     on(GetCoordinatesFromApiSuccessAction, (_, { response }) => {
         let loc = response.geometry.location;
-        return { name: response.name, latitude: loc.lat(), longitude: loc.lng() }
+        return {
+            name: response.name,
+            latitude: loc.lat(),
+            longitude: loc.lng(),
+            utcOffset: response.utc_offset_minutes
+        };
     }),
     on(UpdatePlaceAction, (_, { place }) => place)
 );

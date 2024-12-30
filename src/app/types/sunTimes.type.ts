@@ -1,5 +1,6 @@
 import { MS_PER_DAY } from "../day.consts";
 import * as SunCalc from "suncalc";
+import { Place } from "./place.type";
 
 export type SunTimesType = SunCalc.GetTimesResult;
 
@@ -44,4 +45,17 @@ export function hasSunriseAndSunset(sunTimes: SunTimesType): boolean {
 
 export function dayLongerThanNight(sunTimes: SunTimesType): boolean {
   return (sunTimes.sunset.getTime() - sunTimes.sunrise.getTime()) > (MS_PER_DAY / 2);
+}
+
+export function convertToPlaceTimes(sunTimes: SunTimesType, place: Place): SunTimesType {
+  const offset = place.utcOffset - (new Date().getTimezoneOffset() * -1);
+  const msOffset = offset * 60 * 1000;
+
+  let newSunTimes = { ...sunTimes };
+  for (let key in newSunTimes) {
+    let newKey = key as keyof SunTimesType;
+    newSunTimes[newKey] = new Date(newSunTimes[newKey].getTime() + msOffset);
+  }
+
+  return newSunTimes;
 }
