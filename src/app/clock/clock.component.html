@@ -12,7 +12,7 @@
   <!-- Dots -->
   <div class="clock__time clock__time-now"
     (window:resize)="onResize($event)"
-    [style.transform]="nowDotPosition$ | async"></div>
+    [style.transform]="(nowData$ | async)?.dotPosition"></div>
   <div class="clock__time clock__time-solar-noon"
     [style.transform]="data.solarNoon.dotPosition"></div>
   <div class="clock__time clock__time-nadir"
@@ -39,14 +39,18 @@
 
 <!-- Local time -->
 <svg class="clock__local-time"
-  [attr.viewBox]="nowLabelViewBox$ | async"
-  [style.transform]="nowLabelRotate$ | async">
+  *ngIf="nowData$ | async as nowData"
+  [attr.viewBox]="nowData.label.viewBox"
+  [style.transform]="nowData.label.pathRotate">
   <path id="localTimeLabel" 
-    [attr.d]="nowLabelPath$ | async"
-    [attr.transform]="nowPathTranslate$ | async"></path>
+    [attr.d]="nowData.label.path"
+    [attr.transform]="nowData.label.pathTransform">
+  </path>
   <text>
-    <textPath href="#localTimeLabel" text-anchor="middle" alignment-baseline="auto" startOffset="25%" fill="white">
-      {{ now$ | async | date:'h:mm:ssa' | lowercase }} LOCAL TIME
+    <textPath href="#localTimeLabel" text-anchor="middle"
+      [attr.alignment-baseline]="nowData.label.isAbove ? 'auto' : 'hanging'" 
+      [attr.startOffset]="nowData.label.isAbove ? '25%' : '75%'" fill="white">
+      {{ nowData.time | date:'h:mm:ssa' | lowercase }} LOCAL TIME
     </textPath>
   </text>
 </svg>
