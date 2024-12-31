@@ -119,10 +119,21 @@ clock:host .clock__day-segment {
   border-radius: $radius;
 }
 
-clock:host .clock__night-segment {
+clock:host .clock__night-segment,
+clock:host .clock__stars-segment {
   width: calc($radius - 1px);
   height: calc($radius - 1px);
   border-radius: $radius;
   z-index: 2;
   background-image: radial-gradient(#05090F 18%, #12233D 87%);
+}
+
+.clock__night-segment {
+  z-index: 2;
+  background-image: radial-gradient(#05090F 18%, #12233D 87%);
+}
+
+.clock__stars-segment {
+  z-index: 1;
+  background: red;
 }

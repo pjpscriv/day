@@ -1,6 +1,6 @@
-import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { combineLatest, map, Observable, shareReplay, startWith, Subject, takeUntil, tap, timer } from 'rxjs';
+import { combineLatest, filter, map, Observable, shareReplay, startWith, Subject, takeUntil, tap, timer } from 'rxjs';
 import { MS_PER_DAY, NUMBER_OF_HOURS } from '../day.consts';
 import { getDayMilliseconds } from '../day.helpers';
 import { selectPlace, selectTime } from '../state/day.selectors';
@@ -19,7 +19,9 @@ const LABEL_INDENT = 25;
   templateUrl: './clock.component.html',
   styleUrls: ['./clock.component.scss']
 })
-export class ClockComponent implements OnInit, OnDestroy {
+export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('stars') canvasRef!: ElementRef<HTMLCanvasElement>;
+  
   public hoursList = Array(NUMBER_OF_HOURS).fill(0).map((_, i) => i);
   public minutes = Array(NUMBER_OF_MINUTES).fill(0).map((_, i) => i).filter(v => v % 6 != 0)
 
@@ -68,6 +70,46 @@ export class ClockComponent implements OnInit, OnDestroy {
       shareReplay(),
       takeUntil(this.destroy$)
     );
+
+    // Draw stars
+    resize$.pipe(
+      filter(_ => !!this.canvasRef?.nativeElement),
+      map(_ => {
+      const canvas = this.canvasRef.nativeElement;
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+      
+      const context = canvas.getContext('2d');
+      console.log('Drawing stars');
+
+      if (context) {
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // Clear the canvas
+        context.clearRect(0, 0, width, height);
+
+        // Draw ~20 stars
+        for (let i = 0; i < 80; i++) {
+          const x = Math.random() * width;
+          const y = Math.random() * height;
+          const size = Math.random() * 1 + 1 // 1-2px
+          const brightness = Math.random() * 0.5 + 0.2;
+
+          // Draw the glow
+          context.beginPath();
+          context.arc(x, y, size * 2, 0, Math.PI * 2);
+          context.fillStyle = 'rgba(255, 255, 255, 0.1)';
+          context.fill();
+
+          // Draw the dot
+          context.beginPath();
+          context.arc(x, y, size, 0, Math.PI * 2);
+          context.fillStyle = `rgba(255, 255, 255, ${brightness})`;
+          context.fill();
+        }
+      }
+    })).subscribe();
   }
 
   private getDisplayData(sunTimes: SunTimesType): SunTimesDisplayData {
@@ -145,6 +187,10 @@ export class ClockComponent implements OnInit, OnDestroy {
       `Z`;
 
     return path;
+  }
+
+  public ngAfterViewInit(): void {
+    this.resize$.next(null);
   }
 
   public getHourPosition(hour?: number): string {
