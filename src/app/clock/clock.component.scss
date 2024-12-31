@@ -114,7 +114,7 @@ clock:host * {
 
 // Background
 clock:host .clock__day-segment {
-  background-image: radial-gradient(#82BCE6, #5198C2);
+  background-image: radial-gradient(#82BCE6 10%, #5198C2 60%);
   z-index: 5;
 
   width: $radius;

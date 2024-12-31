@@ -1,6 +1,10 @@
 <div class="app__control-section">
     <place-input></place-input>
     <time-input></time-input>
+    <div class="app__daylight-text">
+        <mat-icon>light_mode</mat-icon>
+        {{ daylightTime$ | async | date:"H'h' m'm'" }} of daylight
+    </div>
 </div>
-<clock></clock>
+<clock (sunTimes)="onNewSunTimes($event)"></clock>
 <div class="app__spacer"></div>

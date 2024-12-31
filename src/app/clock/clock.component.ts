@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, filter, map, Observable, shareReplay, startWith, Subject, takeUntil, tap, timer } from 'rxjs';
 import { MS_PER_DAY, NUMBER_OF_HOURS } from '../day.consts';
@@ -21,6 +21,7 @@ const LABEL_INDENT = 25;
 })
 export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('stars') canvasRef!: ElementRef<HTMLCanvasElement>;
+  @Output() public sunTimes = new EventEmitter<SunTimesType>();
   
   public hoursList = Array(NUMBER_OF_HOURS).fill(0).map((_, i) => i);
   public minutes = Array(NUMBER_OF_MINUTES).fill(0).map((_, i) => i).filter(v => v % 6 != 0)
@@ -45,6 +46,7 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
     const place$ = this.store.select(selectPlace);
     const sunTime$ = combineLatest([time$, place$]).pipe(
       map(([time, place]: [Date, Place]) => [SunCalc.getTimes(time, place.latitude, place.longitude), place] as [SunTimesType, Place]),
+      tap(([sunTimes, _]) => this.sunTimes.emit(sunTimes)),
       map(([sunTimes, place]: [SunTimesType, Place]) => convertToPlaceTimes(sunTimes, place)),
       takeUntil(this.destroy$)
     )
@@ -66,8 +68,13 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
     this.maskMode$ = sunTime$.pipe(
       map(st => dayLongerThanNight(st) ? 'add' : 'subtract')
     );
-    this.starRotation$ = sunTime$.pipe(
-      map(st => `rotate(${this.getRotation(st.night)}rad)`)
+    this.starRotation$ = time$.pipe(
+      map(date => {
+        // Convert fraction of way through the year to fraction of way through the day
+        const daysElapsed = (date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / MS_PER_DAY;
+        const dayFraction = new Date((daysElapsed / 366) * MS_PER_DAY);
+        return `rotate(${this.getRotation(dayFraction)}rad)`;
+      })
     );
     this.nowData$ = combineLatest([seconds$, resize$]).pipe(
       map(([d, _]) => this.getNowData(d)),

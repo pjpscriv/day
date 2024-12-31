@@ -19,3 +19,11 @@ root:host {
   width: 100%;
   z-index: 100;
 }
+
+.app__daylight-text {
+  font-size: 20px;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

@@ -1,6 +1,6 @@
 html, body {
   height: 100%;
   margin: 0;
-  background-color: #1D2740 !important;
+  background: linear-gradient(#1D2740, #2A3E68);
   overflow-x: hidden;
 }
