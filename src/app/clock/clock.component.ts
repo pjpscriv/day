@@ -29,6 +29,7 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
   public nowData$ = new Observable<TimeDisplay>();
   public gradient$ = new Observable<any>();
   public maskMode$ = new Observable<string>();
+  public starRotation$ = new Observable<string>();
 
   private resize$ = new Subject();
   private destroy$ = new Subject<void>();
@@ -64,6 +65,9 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
     );
     this.maskMode$ = sunTime$.pipe(
       map(st => dayLongerThanNight(st) ? 'add' : 'subtract')
+    );
+    this.starRotation$ = sunTime$.pipe(
+      map(st => `rotate(${this.getRotation(st.night)}rad)`)
     );
     this.nowData$ = combineLatest([seconds$, resize$]).pipe(
       map(([d, _]) => this.getNowData(d)),

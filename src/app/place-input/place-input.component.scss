@@ -35,6 +35,7 @@ place-input:host {
   display: flex;
   grid-area: input;
   width: 100%;
+  font-family: 'Inter', sans-serif;
 }
 
 .place-input__lat-long-input {

@@ -23,6 +23,10 @@ clock:host {
   & *:not(.clock__label_text div) {
     position: absolute;
   }
+
+  div {
+    font-family: 'Inter', sans-serif;
+  }
 }
 
 clock:host * {
