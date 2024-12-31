@@ -85,12 +85,13 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
       if (context) {
         const width = canvas.width;
         const height = canvas.height;
+        const starCount = Math.min(width, height) / 4;
 
         // Clear the canvas
         context.clearRect(0, 0, width, height);
 
         // Draw ~20 stars
-        for (let i = 0; i < 80; i++) {
+        for (let i = 0; i < starCount; i++) {
           const x = Math.random() * width;
           const y = Math.random() * height;
           const size = Math.random() * 1 + 1 // 1-2px
