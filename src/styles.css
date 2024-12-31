@@ -2,5 +2,5 @@ html, body {
   height: 100%;
   margin: 0;
   background: linear-gradient(#1D2740, #2A3E68);
-  overflow-x: hidden;
+  overflow: hidden;
 }
