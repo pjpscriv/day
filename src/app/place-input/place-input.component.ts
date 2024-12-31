@@ -66,8 +66,7 @@ export class PlaceInputComponent implements OnInit {
 
     // Get User's Location
     navigator.geolocation.getCurrentPosition((position) => {
-      console.log(`User's location:`);
-      console.log(position);
+      // console.log(`User's location:`, position);
       this.place = {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,

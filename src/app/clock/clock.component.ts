@@ -91,7 +91,7 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
       canvas.height = canvas.clientHeight;
       
       const context = canvas.getContext('2d');
-      console.log('Drawing stars');
+      // console.log('Drawing stars');
 
       if (context) {
         const width = canvas.width;

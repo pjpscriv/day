@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { hasSunriseAndSunset, SunTimesType } from './types/sunTimes.type';
-import { DatePipe } from '@angular/common';
+import { Subject } from 'rxjs';
 import { MS_PER_HOUR, MS_PER_MINUTE } from './day.consts';
+import { hasSunriseAndSunset, SunTimesType } from './types/sunTimes.type';
 
 @Component({
   selector: 'root',
@@ -11,10 +10,6 @@ import { MS_PER_HOUR, MS_PER_MINUTE } from './day.consts';
 })
 export class AppComponent {
   public daylightTime$ = new Subject<string>();
-
-  constructor(
-    datePipe: DatePipe
-  ) {}
 
   public onNewSunTimes(sunTimes: SunTimesType): void {
     if (!hasSunriseAndSunset(sunTimes)) {
