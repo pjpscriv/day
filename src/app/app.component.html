@@ -3,7 +3,7 @@
     <time-input></time-input>
     <div class="app__daylight-text">
         <mat-icon>light_mode</mat-icon>
-        {{ daylightTime$ | async }} of daylight
+        <div>{{ daylightTime$ | async }} of daylight</div>
     </div>
 </div>
 <clock (sunTimes)="onNewSunTimes($event)"></clock>

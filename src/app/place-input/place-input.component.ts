@@ -22,8 +22,8 @@ import { QueryAutocompletePrediction } from '../types/google-maps.type';
   styleUrls: ['./place-input.component.scss']
 })
 export class PlaceInputComponent implements OnInit {
-  private place: Place;
-  private oldValue: string = '';
+  private place!: Place;
+  private oldValue?: QueryAutocompletePrediction = undefined;
   public value: string = '';
   public autocompletePlaces$ = new Observable<QueryAutocompletePrediction[]>();
   public showLatLongInput = false;
@@ -60,6 +60,7 @@ export class PlaceInputComponent implements OnInit {
   }
 
   public setToStartingPosition(): void {
+    this.oldValue = undefined;
     if (!navigator.geolocation) {
       console.log("Your browser is too old to share your location :'(");
       this.place = Wellington;
@@ -68,17 +69,18 @@ export class PlaceInputComponent implements OnInit {
     }
 
     // Get User's Location
-    navigator.geolocation.getCurrentPosition((position) => {
-      // console.log(`User's location:`, position);
-      this.place = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        name: 'Your location',
-        utcOffset: new Date().getTimezoneOffset() * -1
-      }
-      this.store.dispatch(UpdatePlaceAction({ place: this.place }))
-      this.store.dispatch(ClearSuggestionsAction());
-    },
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // console.log(`User's location:`, position);
+        this.place = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          name: 'Your location',
+          utcOffset: new Date().getTimezoneOffset() * -1
+        }
+        this.store.dispatch(UpdatePlaceAction({ place: this.place }))
+        this.store.dispatch(ClearSuggestionsAction());
+      },
       (error) => {
         console.log('Position not given', error.message);
         this.place = Wellington; 
@@ -113,19 +115,19 @@ export class PlaceInputComponent implements OnInit {
   }
 
   public onDropdownClick(event: any): void {
-    event.stopPropagation;
-    event.preventDefault;
+    // event.stopPropagation;
+    // event.preventDefault;
     // console.log('Dropdown clicked');
     // console.log(event);
     this.store.dispatch(UpdateSuggestionsAction({ suggestions: mostPopulatedCities }));
   }
 
   public onLocationSelected(event: any): void {
-    this.oldValue = '';
-    const value = event.option.value;
+    this.oldValue = undefined;
+    const value = event.option.value as QueryAutocompletePrediction;
     const props = {
-      placeId: value.place_id,
-      placeName: value.description
+      placeId: value.place_id as string,
+      placeName: value.description as string
     }
     this.store.dispatch(GetCoordinatesFromApiAction(props))
   }
@@ -140,7 +142,13 @@ export class PlaceInputComponent implements OnInit {
   }
 
   public onFocus(): void {
-    this.oldValue = this.textInputFormControl.value;
+    let value = this.textInputFormControl.value;
+    if (value === null) {
+      value = { description: this.place.name };
+    }
+    if (!!value) { // && typeof value === 'string') {
+      this.oldValue = value;
+    }
     this.textInputFormControl.setValue('');
     // this.store.dispatch(ClearSuggestionsAction());
   }

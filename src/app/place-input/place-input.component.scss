@@ -4,10 +4,10 @@
 place-input:host {
   align-items: center;
   display: grid;
-  width: 90%;
+  width: 100%;
   grid-template-rows: auto;
 
-  grid-template-columns: 1fr auto 4fr auto 1fr;
+  grid-template-columns: 48px 1fr 4fr 1fr 48px;
   grid-template-areas: "switcher spacer-1 input spacer-2 reset";
   row-gap: 0;
 
@@ -55,16 +55,16 @@ place-input:host {
   }
 
   .mat-form-field-infix {
-    padding: 10px;
+    padding: 8px;
     border: 0;
   }
 
   .mat-form-field-flex {
     align-items: center;
-    border: 2px solid #FFFFFF66;
+    border: 1px solid #FFFFFF66;
     border-radius: 100px;
-    padding-left: 12px;
-    padding-right: 6px;
+    padding-left: 7px;
+    padding-right: 3px;
   }
   
   input {
@@ -73,13 +73,25 @@ place-input:host {
 
   .mat-form-field-suffix {
     width: 24px;
-    background-color: $button-background;
+    // background-color: $button-background;
     border-radius: 20px;
 
     mat-icon {
       padding-left: 2px;
       padding-top: 1px;
     }
+  }
+
+  .mat-form-field-suffix::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    border-radius: 100px;
+    background-color: $button-background;
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
   }
 
   .mat-form-field-underline {
@@ -125,6 +137,16 @@ place-input:host {
     background-color: #1D2740CC;
     backdrop-filter: blur(10px);
     border: #FFFFFF66 solid 2px;
+  }
+
+  .mat-option.mat-selected:not(.mat-active):not(:hover) {
+    background-color: #fff6;
+  }
+
+  .mat-option.mat-active,
+  .mat-option:hover:not(.mat-option-disabled), 
+  .mat-option:focus:not(.mat-option-disabled) {
+    background-color: #fff2;
   }
 
   font-family: 'Inter', sans-serif;

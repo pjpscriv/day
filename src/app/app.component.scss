@@ -26,4 +26,14 @@ root:host {
   display: flex;
   align-items: center;
   gap: 8px;
+  text-align: center;
+  justify-content: center;
+
+  div {
+    max-width: calc(90vw - 32px);
+  }
+}
+
+::ng-deep .app__daylight-text mat-icon {
+  min-width: 24px;
 }

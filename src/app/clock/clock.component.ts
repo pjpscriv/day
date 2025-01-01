@@ -46,7 +46,7 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
   public ngOnInit(): void {
     // Inputs
     const time$ = this.store.select(selectTime);
-    const place$ = this.store.select(selectPlace);
+    const place$ = this.store.select(selectPlace).pipe(filter(p => !!p.name));
     const sunTime$ = combineLatest([time$, place$]).pipe(
       map(([time, place]: [Date, Place]) => [SunCalc.getTimes(time, place.latitude, place.longitude), place] as [SunTimesType, Place]),
       tap(([sunTimes, _]) => this.sunTimes.emit(sunTimes)),
