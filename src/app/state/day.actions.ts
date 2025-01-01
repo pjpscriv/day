@@ -1,5 +1,6 @@
 import { createAction, props } from "@ngrx/store";
 import { Place } from '../types/place.type';
+import { PlaceResult, QueryAutocompletePrediction } from "../types/google-maps.type";
 
 export enum DayActionTypes {
     GET_SUGGECTIONS                  = '[Suggections] Get',
@@ -7,6 +8,7 @@ export enum DayActionTypes {
     GET_SUGGECTIONS_FROM_API_SUCCESS = '[Suggections] Get From API Success',
     GET_SUGGECTIONS_FROM_API_FAILURE = '[Suggections] Get From API Failure',
     CLEAR_SUGGECTIONS                = '[Suggections] Clear',
+    UPDATE_SUGGESTIONS               = '[Suggections] Update',
     GET_COORDINATES                  = '[Coordinates] Get',
     GET_COORDINATES_FROM_API         = '[Coordinates] Get From API',
     GET_COORDINATES_FROM_API_SUCCESS = '[Coordinates] Get From API Success',
@@ -23,7 +25,7 @@ export const GetSuggestionsFromApiAction = createAction(
 
 export const GetSuggestionsFromApiSuccessAction = createAction(
     DayActionTypes.GET_SUGGECTIONS_FROM_API_SUCCESS,
-    props<{ result: any[] }>()
+    props<{ result: QueryAutocompletePrediction[] | null }>()
 );
 
 export const GetSuggestionsFromApiFailureAction = createAction(
@@ -35,6 +37,10 @@ export const ClearSuggestionsAction = createAction(
     DayActionTypes.CLEAR_SUGGECTIONS
 );
 
+export const UpdateSuggestionsAction = createAction(
+    DayActionTypes.UPDATE_SUGGESTIONS,
+    props<{ suggestions: QueryAutocompletePrediction[] }>()
+);
 
 // Place (Coordinates)
 export const GetCoordinatesAction = createAction(
@@ -44,12 +50,12 @@ export const GetCoordinatesAction = createAction(
 
 export const GetCoordinatesFromApiAction = createAction(
     DayActionTypes.GET_COORDINATES_FROM_API,
-    props<{ placeId: string }>()
+    props<{ placeId: string, placeName: string }>()
 );
 
 export const GetCoordinatesFromApiSuccessAction = createAction(
     DayActionTypes.GET_COORDINATES_FROM_API_SUCCESS,
-    props<{ response: any }>()
+    props<{ response: PlaceResult | null, name: string }>()
 );
 
 export const GetCoordinatesFromApiFailureAction = createAction(

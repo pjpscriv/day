@@ -1,4 +1,5 @@
 @import '../shared.styles';
+// @import '../../custom-theme.scss';
 
 place-input:host {
   align-items: center;
@@ -9,7 +10,6 @@ place-input:host {
   grid-template-columns: 1fr auto 4fr auto 1fr;
   grid-template-areas: "switcher spacer-1 input spacer-2 reset";
   row-gap: 0;
-
 
   * {
     cursor: pointer;
@@ -47,6 +47,50 @@ place-input:host {
   min-width: 60%;
 }
 
+// Override textbox styles
+::ng-deep .place-input__name-input {
+  .mat-form-field-prefix,
+  .mat-form-field-suffix {
+    height: 24px;
+  }
+
+  .mat-form-field-infix {
+    padding: 10px;
+    border: 0;
+  }
+
+  .mat-form-field-flex {
+    align-items: center;
+    border: 2px solid #FFFFFF66;
+    border-radius: 100px;
+    padding-left: 12px;
+    padding-right: 6px;
+  }
+  
+  input {
+    text-align: center;
+  }
+
+  .mat-form-field-suffix {
+    width: 24px;
+    background-color: $button-background;
+    border-radius: 20px;
+
+    mat-icon {
+      padding-left: 2px;
+      padding-top: 1px;
+    }
+  }
+
+  .mat-form-field-underline {
+    display: none;
+  }
+
+  &.mat-focused .mat-form-field-flex {
+    border: 2px solid #3f51b5;
+  }
+}
+
 .place-input__switch-input-button {
   display: none;
   grid-area: switcher;
@@ -69,5 +113,19 @@ place-input:host {
 
 // Fix up form field padding
 ::ng-deep .mat-form-field .mat-form-field-wrapper {
-  padding-bottom: 0;
+  padding-bottom: 2px;
+}
+
+// Override dropdown styles
+::ng-deep .cdk-overlay-container {
+
+  .mat-autocomplete-panel {
+    max-height: 60vh;
+    border-radius: 20px;
+    background-color: #1D2740CC;
+    backdrop-filter: blur(10px);
+    border: #FFFFFF66 solid 2px;
+  }
+
+  font-family: 'Inter', sans-serif;
 }

@@ -1,43 +1,43 @@
 import { Injectable } from '@angular/core';
-import { bindCallback, Observable, of } from 'rxjs';
+import { bindCallback, Observable } from 'rxjs';
+import { GetDetailsObservable, GetQueryPredictionsObservable, PlaceDetailsResponse, QueryAutocompletionResponse } from 'src/app/types/google-maps.type';
 
-declare let google: any;
+// declare let google: any;
 
 @Injectable({
   providedIn: 'root'
 })
 export class GoogleMapsService {
-  private autoCompService: any;
-  private placesService: any;
-  private getRecsFunc: ((input: any) => Observable<any>) | any;
-  private getLocFunc: ((input: any) => Observable<any>) | any;
+  private autoCompService!: google.maps.places.AutocompleteService;
+  private placesService!: google.maps.places.PlacesService;
+  private getAutoCompQueryPredictionsFunc!: GetQueryPredictionsObservable;
+  private getPlaceDetailsFunc!: GetDetailsObservable;
 
 
-  public initService(): any {
+  public initService(): void {
     this.autoCompService = new google.maps.places.AutocompleteService();
     const map = new google.maps.Map(document.createElement('div'));
     this.placesService = new google.maps.places.PlacesService(map);
 
     let getQueryPredictionsBoundScope = this.autoCompService.getQueryPredictions.bind(this.autoCompService)
-    this.getRecsFunc = bindCallback(getQueryPredictionsBoundScope);
+    this.getAutoCompQueryPredictionsFunc = bindCallback(getQueryPredictionsBoundScope);
 
     let getDetailsBoundScope = this.placesService.getDetails.bind(this.placesService);
-    this.getLocFunc = bindCallback(getDetailsBoundScope);
+    this.getPlaceDetailsFunc = bindCallback(getDetailsBoundScope);
   }
 
-  // TODO: add types
-  public getRecommendations(text: string): Observable<any> {
+  public getAutoCompQueyPredictions(text: string): Observable<QueryAutocompletionResponse> {
     if (!this.dependanciesReady())
-      return of(null);
+      throw new Error('Google Maps API not loaded');
 
-    return this.getRecsFunc({ input: text });
+    return this.getAutoCompQueryPredictionsFunc({ input: text });
   }
 
-  public getLocationInformation(placeId: string): Observable<any> {
+  public getPlaceDetails(placeId: string): Observable<PlaceDetailsResponse> {
     if (!this.dependanciesReady())
-      return of(null);
+      throw new Error('Google Maps API not loaded');
 
-    return this.getLocFunc({ placeId: placeId, fields: ['name', 'geometry', 'utc_offset_minutes' ] })
+    return this.getPlaceDetailsFunc({ placeId: placeId, fields: ['name', 'formatted_address', 'geometry', 'utc_offset_minutes' ] })
   }
 
   private dependanciesReady(): boolean {

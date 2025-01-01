@@ -6,6 +6,7 @@ import {
   GetSuggestionsFromApiFailureAction,
   GetSuggestionsFromApiSuccessAction,
   UpdatePlaceAction,
+  UpdateSuggestionsAction,
   UpdateTimeAction
 } from './day.actions';
 import { initialState } from "./day.state";
@@ -17,10 +18,13 @@ export const suggestionsReducer = createReducer(
         return { ...item, isLoading: true, item: [] };
     }),
     on(GetSuggestionsFromApiSuccessAction, (item, { result }) => {
-        return { ...item, isLoading: false, item: result };
+        return { ...item, isLoading: false, item: result ?? [] };
     }),
     on(GetSuggestionsFromApiFailureAction, (item, { errorMessage }) => {
         return { ...item, isLoading: false, error: errorMessage };
+    }),
+    on(UpdateSuggestionsAction, (_, { suggestions }) => {
+        return { isLoading: false, item: suggestions };
     }),
     on(ClearSuggestionsAction, (_) => {
         return initialState.suggestedLocations;
@@ -29,12 +33,16 @@ export const suggestionsReducer = createReducer(
 
 export const placeReducer = createReducer(
     initialState.place,
-    on(GetCoordinatesFromApiSuccessAction, (_, { response }) => {
-        let loc = response.geometry.location;
+    on(GetCoordinatesFromApiSuccessAction, (item, { response, name }) => {
+        if (!response?.geometry?.location || !response.utc_offset_minutes) {
+            console.error('Insufficient data returned from Google Maps API', response);
+            return item;
+        }
+        
         return {
-            name: response.name,
-            latitude: loc.lat(),
-            longitude: loc.lng(),
+            name: name,
+            latitude: response.geometry.location.lat(),
+            longitude: response.geometry.location.lng(),
             utcOffset: response.utc_offset_minutes
         };
     }),

@@ -7,10 +7,13 @@ import {
   GetCoordinatesFromApiAction,
   GetSuggestionsFromApiAction,
   UpdatePlaceAction,
+  UpdateSuggestionsAction,
   UpdateTimeAction
 } from '../state/day.actions';
 import { selectPlace, selectSuggestedLocations } from '../state/day.selectors';
 import { Place, Wellington, DefaultPlace } from '../types/place.type';
+import { mostPopulatedCities, StoreState } from '../state/day.state';
+import { QueryAutocompletePrediction } from '../types/google-maps.type';
 
 
 @Component({
@@ -22,7 +25,7 @@ export class PlaceInputComponent implements OnInit {
   private place: Place;
   private oldValue: string = '';
   public value: string = '';
-  public autocompletePlaces$ = new Observable<any[]>();
+  public autocompletePlaces$ = new Observable<QueryAutocompletePrediction[]>();
   public showLatLongInput = false;
   public textInputFormControl = new FormControl();
 
@@ -47,10 +50,10 @@ export class PlaceInputComponent implements OnInit {
   });
 
     this.autocompletePlaces$ = merge(
-      this.textInputFormControl.valueChanges,
+      // this.textInputFormControl.valueChanges,
       this.store.select(selectSuggestedLocations)
     ).pipe(
-      map((value: any) => {
+      map((value: StoreState<QueryAutocompletePrediction[]>) => {
         return (!!value?.item) ? value.item : [];
       })
     )
@@ -109,10 +112,22 @@ export class PlaceInputComponent implements OnInit {
     this.showLatLongInput = !this.showLatLongInput;
   }
 
+  public onDropdownClick(event: any): void {
+    event.stopPropagation;
+    event.preventDefault;
+    // console.log('Dropdown clicked');
+    // console.log(event);
+    this.store.dispatch(UpdateSuggestionsAction({ suggestions: mostPopulatedCities }));
+  }
+
   public onLocationSelected(event: any): void {
-    const thing = event.option.value;
     this.oldValue = '';
-    this.store.dispatch(GetCoordinatesFromApiAction({ placeId: thing.place_id }))
+    const value = event.option.value;
+    const props = {
+      placeId: value.place_id,
+      placeName: value.description
+    }
+    this.store.dispatch(GetCoordinatesFromApiAction(props))
   }
 
   public reset() {
@@ -127,6 +142,7 @@ export class PlaceInputComponent implements OnInit {
   public onFocus(): void {
     this.oldValue = this.textInputFormControl.value;
     this.textInputFormControl.setValue('');
+    // this.store.dispatch(ClearSuggestionsAction());
   }
 
   public onBlur(): void {
@@ -134,6 +150,7 @@ export class PlaceInputComponent implements OnInit {
       if (!!this.oldValue) {
         this.textInputFormControl.setValue(this.oldValue);
       }
+      // this.store.dispatch(ClearSuggestionsAction());
     }, 100);
   }
 }

@@ -11,8 +11,11 @@ import { TimeDisplay } from '../types/timeDisplay.type';
 
 // TODO: Move to (UI?) constants file
 const NUMBER_OF_MINUTES = NUMBER_OF_HOURS * 6;
-const SUN_MOON_INDENT = 13;
+const SUN_MOON_INDENT = 14;
 const LABEL_INDENT = 25;
+const HOUR_MARK_INDENT = 6;
+const MINUTE_MARK_INDENT = 4.5;
+const NOW_DOT_INDENT = 4;
 
 @Component({
   selector: 'clock',
@@ -86,42 +89,43 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
     resize$.pipe(
       filter(_ => !!this.canvasRef?.nativeElement),
       map(_ => {
-      const canvas = this.canvasRef.nativeElement;
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-      
-      const context = canvas.getContext('2d');
-      // console.log('Drawing stars');
+        const canvas = this.canvasRef.nativeElement;
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        
+        const context = canvas.getContext('2d');
+        // console.log('Drawing stars');
 
-      if (context) {
-        const width = canvas.width;
-        const height = canvas.height;
-        const starCount = Math.min(width, height) / 4;
+        if (context) {
+          const width = canvas.width;
+          const height = canvas.height;
+          const starCount = Math.min(width, height) / 4;
 
-        // Clear the canvas
-        context.clearRect(0, 0, width, height);
+          // Clear the canvas
+          context.clearRect(0, 0, width, height);
 
-        // Draw ~20 stars
-        for (let i = 0; i < starCount; i++) {
-          const x = Math.random() * width;
-          const y = Math.random() * height;
-          const size = Math.random() * 1 + 1 // 1-2px
-          const brightness = Math.random() * 0.5 + 0.2;
+          // Draw ~20 stars
+          for (let i = 0; i < starCount; i++) {
+            const x = Math.random() * width;
+            const y = Math.random() * height;
+            const size = Math.random() * 1 + 1 // 1-2px
+            const brightness = Math.random() * 0.5 + 0.2;
 
-          // Draw the glow
-          context.beginPath();
-          context.arc(x, y, size * 2, 0, Math.PI * 2);
-          context.fillStyle = 'rgba(255, 255, 255, 0.1)';
-          context.fill();
+            // Draw the glow
+            context.beginPath();
+            context.arc(x, y, size * 2, 0, Math.PI * 2);
+            context.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            context.fill();
 
-          // Draw the dot
-          context.beginPath();
-          context.arc(x, y, size, 0, Math.PI * 2);
-          context.fillStyle = `rgba(255, 255, 255, ${brightness})`;
-          context.fill();
+            // Draw the dot
+            context.beginPath();
+            context.arc(x, y, size, 0, Math.PI * 2);
+            context.fillStyle = `rgba(255, 255, 255, ${brightness})`;
+            context.fill();
+          }
         }
-      }
-    })).subscribe();
+      })
+    ).subscribe();
   }
 
   private getDisplayData(sunTimes: SunTimesType): SunTimesDisplayData {
@@ -174,7 +178,7 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
     const rad = this.getRadius();
     const rotation = this.getRotation(time);
     const isAbove = (Math.PI * 0.5) < rotation && rotation < (Math.PI * 1.5);
-    const dotPosition = this.getTranslation(rotation, 3);
+    const dotPosition = this.getTranslation(rotation, NOW_DOT_INDENT);
     const label = {
       viewBox: `0 0 ${rad * 2} ${rad * 2}`,
       path: this.getBorderPath(),
@@ -207,12 +211,12 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public getHourPosition(hour?: number): string {
     const rotation = (hour ?? 0) * 2 * Math.PI / NUMBER_OF_HOURS;
-    return this.getTranslation(rotation, 5);
+    return this.getTranslation(rotation, HOUR_MARK_INDENT);
   }
 
   public getMinutePosition(min?: number): any {
     const rotation = (min ?? 0) * 2 * Math.PI / NUMBER_OF_MINUTES;
-    return this.getTranslation(rotation, 3);
+    return this.getTranslation(rotation, MINUTE_MARK_INDENT);
   }
 
   private getRotation(date: Date): number {

@@ -121,6 +121,7 @@ clock:host .clock__day-segment {
   height: $radius;
   z-index: 5;
   border-radius: $radius;
+  box-shadow: 0 0 0 4px #fff4 inset;
 }
 
 clock:host .clock__night-segment,
@@ -135,9 +136,10 @@ clock:host .clock__stars-segment {
 .clock__night-segment {
   z-index: 2;
   background-image: radial-gradient(#05090F 18%, #12233D 87%);
+  box-shadow: 0 0 0 3px #fff4 inset;
 }
 
 .clock__stars-segment {
   z-index: 1;
-  background: red;
+  box-shadow: 0 0 0 3px #fff4 inset
 }
