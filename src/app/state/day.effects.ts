@@ -1,6 +1,6 @@
 import { Injectable, NgZone } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, combineLatest, filter, map, of, switchMap, tap, withLatestFrom } from "rxjs";
+import { catchError, combineLatest, debounceTime, filter, map, of, switchMap, tap, withLatestFrom } from "rxjs";
 import { GoogleMapsService } from "../place-input/google-maps/google-maps.service";
 import {
     GetCoordinatesFromApiAction,
@@ -94,6 +94,7 @@ export class DayEffects {
 
     public updateTime$ = createEffect(() => this.actions$.pipe(
         ofType(UpdateTimeAction),
+        debounceTime(200),
         map(action => moment(action.time).format('YYYY-MM-DD')),
         tap(timeStr => {
             this.ngZone.run(() => {
