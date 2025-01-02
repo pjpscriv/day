@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { bindCallback, Observable } from 'rxjs';
-import { GetDetailsObservable, GetQueryPredictionsObservable, PlaceDetailsResponse, QueryAutocompletionResponse } from 'src/app/types/google-maps.type';
-
-// declare let google: any;
+import { GetDetailsObservable, GetQueryPredictionsObservable, PlaceDetailsResponse, QueryAutocompletionResponse } from 'src/app/types/google-maps.types';
 
 @Injectable({
   providedIn: 'root'

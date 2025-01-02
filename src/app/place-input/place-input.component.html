@@ -11,9 +11,11 @@
 
     <!-- Place Name Input -->
     <ng-template #nameInput>
-      <mat-form-field class="place-input__name-input">
+      <mat-form-field class="place-input__name-input"
+        [style.width]="inputWidth$ | async">
         <mat-icon matPrefix>pin_drop</mat-icon>
         <input
+          #placeNameInput
           matInput
           type="text"
           [value]="place.name"
@@ -21,7 +23,7 @@
           [formControl]="textInputFormControl"
           (focus)="onFocus()"
           (blur)="onBlur()">
-          <mat-icon matSuffix (click)="onDropdownClick($event)">keyboard_arrow_down</mat-icon>
+        <mat-icon matSuffix (click)="onDropdownClick($event)">keyboard_arrow_down</mat-icon>
         <mat-autocomplete
           #auto="matAutocomplete"
           (optionSelected)="onLocationSelected($event)"

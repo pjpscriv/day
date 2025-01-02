@@ -1,6 +1,6 @@
 import { MS_PER_DAY } from "../day.consts";
 import * as SunCalc from "suncalc";
-import { Place } from "./place.type";
+import { Place } from "./place.types";
 
 export type SunTimesType = SunCalc.GetTimesResult;
 

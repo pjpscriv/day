@@ -6,7 +6,7 @@ export type Place = {
 }
 
 export const Wellington: Place = {
-    name: "Wellington, New Zealand",
+    name: "Wellington, New Zealand 🇳🇿",
     latitude: -41.2923814,
     longitude: 174.7787463,
     utcOffset: getNZUtcOffset()

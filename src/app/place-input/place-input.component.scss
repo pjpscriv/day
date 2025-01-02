@@ -7,7 +7,7 @@ place-input:host {
   width: 100%;
   grid-template-rows: auto;
 
-  grid-template-columns: 48px 1fr 4fr 1fr 48px;
+  grid-template-columns: 48px auto 4fr auto 48px;
   grid-template-areas: "switcher spacer-1 input spacer-2 reset";
   row-gap: 0;
 
@@ -40,11 +40,11 @@ place-input:host {
 
 .place-input__lat-long-input {
   max-width: 40%;
-  min-width: 80px;
 }
 
 .place-input__name-input {
-  min-width: 60%;
+  min-width: 220px;
+  transition: width 0.1s;
 }
 
 // Override textbox styles
@@ -131,12 +131,29 @@ place-input:host {
 // Override dropdown styles
 ::ng-deep .cdk-overlay-container {
 
+  .cdk-overlay-pane {
+    width: unset !important;
+    max-width: 100vw;
+  }
+
   .mat-autocomplete-panel {
-    max-height: 60vh;
     border-radius: 20px;
     background-color: #1D2740CC;
     backdrop-filter: blur(10px);
     border: #FFFFFF66 solid 2px;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: #ffffff44;
+      border-radius: 20px;
+    }
   }
 
   .mat-option.mat-selected:not(.mat-active):not(:hover) {

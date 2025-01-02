@@ -4,10 +4,10 @@ import { combineLatest, filter, map, Observable, shareReplay, startWith, Subject
 import { MS_PER_DAY, NUMBER_OF_HOURS } from '../day.consts';
 import { getDayMilliseconds } from '../day.helpers';
 import { selectPlace, selectTime } from '../state/day.selectors';
-import { Place } from '../types/place.type';
-import { hasSunriseAndSunset, dayLongerThanNight, SunTimesType, SunTimesDisplayData, convertToPlaceTimes } from '../types/sunTimes.type';
+import { Place } from '../types/place.types';
+import { hasSunriseAndSunset, dayLongerThanNight, SunTimesType, SunTimesDisplayData, convertToPlaceTimes } from '../types/sunTimes.types';
 import * as SunCalc from 'suncalc';
-import { TimeDisplay } from '../types/timeDisplay.type';
+import { TimeDisplay } from '../types/timeDisplay.types';
 
 // TODO: Move to (UI?) constants file
 const NUMBER_OF_MINUTES = NUMBER_OF_HOURS * 6;

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Subject } from 'rxjs';
 import { MS_PER_HOUR, MS_PER_MINUTE } from './day.consts';
-import { hasSunriseAndSunset, SunTimesType } from './types/sunTimes.type';
+import { hasSunriseAndSunset, SunTimesType } from './types/sunTimes.types';
 
 @Component({
   selector: 'root',

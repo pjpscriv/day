@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { debounceTime, filter, map, merge, Observable, tap } from 'rxjs';
+import { combineLatest, debounceTime, delay, filter, map, merge, Observable, shareReplay, tap } from 'rxjs';
 import {
   ClearSuggestionsAction,
   GetCoordinatesFromApiAction,
@@ -11,9 +11,10 @@ import {
   UpdateTimeAction
 } from '../state/day.actions';
 import { selectPlace, selectSuggestedLocations } from '../state/day.selectors';
-import { Place, Wellington, DefaultPlace } from '../types/place.type';
-import { mostPopulatedCities, StoreState } from '../state/day.state';
-import { QueryAutocompletePrediction } from '../types/google-maps.type';
+import { Place, Wellington, DefaultPlace } from '../types/place.types';
+import { SuggestedLocationsStoreType } from '../state/day.state';
+import { QueryAutocompletePrediction } from '../types/google-maps.types';
+import { mostPopulatedCities } from '../types/suggested-locations.types';
 
 
 @Component({
@@ -22,6 +23,8 @@ import { QueryAutocompletePrediction } from '../types/google-maps.type';
   styleUrls: ['./place-input.component.scss']
 })
 export class PlaceInputComponent implements OnInit {
+  @ViewChild('placeNameInput') nameInput!: ElementRef;
+
   private place!: Place;
   private oldValue?: QueryAutocompletePrediction = undefined;
   public value: string = '';
@@ -30,6 +33,7 @@ export class PlaceInputComponent implements OnInit {
   public textInputFormControl = new FormControl();
 
   public place$: Observable<Place>;
+  public inputWidth$ = new Observable<string>();
 
   constructor(
     private store: Store
@@ -44,17 +48,29 @@ export class PlaceInputComponent implements OnInit {
     // Send API Query
     this.textInputFormControl.valueChanges.pipe(
       filter(value => !!value && typeof value === 'string'),
-      debounceTime(200)
+      debounceTime(300)
     ).subscribe(searchTerm => {
       this.store.dispatch(GetSuggestionsFromApiAction({ searchTerm }))
-  });
+    });
 
-    this.autocompletePlaces$ = merge(
-      // this.textInputFormControl.valueChanges,
-      this.store.select(selectSuggestedLocations)
-    ).pipe(
-      map((value: StoreState<QueryAutocompletePrediction[]>) => {
+    const suggestedLocations$ = this.store.select(selectSuggestedLocations).pipe(
+      shareReplay()
+    );
+
+    this.autocompletePlaces$ = suggestedLocations$.pipe(
+      delay(50),
+      map((value: SuggestedLocationsStoreType) => {
         return (!!value?.item) ? value.item : [];
+      })
+    )
+
+    this.inputWidth$ = combineLatest([this.place$, suggestedLocations$]).pipe(
+      filter(([p, s]: [Place, SuggestedLocationsStoreType]) => !!p.name || s.item?.length > 0),
+      map(([plce, suggs]: [Place, SuggestedLocationsStoreType]) => {
+        const placeWidth = this.hackGetTextWidth(plce.name);
+        const suggestionWidths = suggs.item?.map(s => this.hackGetTextWidth(s.description)) || [];
+        const width = Math.max(placeWidth, ...suggestionWidths);
+        return `${width}px`;
       })
     )
   }
@@ -115,21 +131,23 @@ export class PlaceInputComponent implements OnInit {
   }
 
   public onDropdownClick(event: any): void {
-    // event.stopPropagation;
-    // event.preventDefault;
-    // console.log('Dropdown clicked');
-    // console.log(event);
     this.store.dispatch(UpdateSuggestionsAction({ suggestions: mostPopulatedCities }));
   }
 
   public onLocationSelected(event: any): void {
+    // console.log('onLocationSelected');
     this.oldValue = undefined;
     const value = event.option.value as QueryAutocompletePrediction;
     const props = {
       placeId: value.place_id as string,
       placeName: value.description as string
     }
-    this.store.dispatch(GetCoordinatesFromApiAction(props))
+    this.store.dispatch(GetCoordinatesFromApiAction(props));
+    this.store.dispatch(ClearSuggestionsAction());
+
+    setTimeout(() => {
+      this.nameInput.nativeElement.blur();
+    }, 200);
   }
 
   public reset() {
@@ -142,6 +160,7 @@ export class PlaceInputComponent implements OnInit {
   }
 
   public onFocus(): void {
+    // console.log('onFocus');
     let value = this.textInputFormControl.value;
     if (value === null) {
       value = { description: this.place.name };
@@ -150,15 +169,24 @@ export class PlaceInputComponent implements OnInit {
       this.oldValue = value;
     }
     this.textInputFormControl.setValue('');
-    // this.store.dispatch(ClearSuggestionsAction());
   }
 
   public onBlur(): void {
+    // console.log('onBlur');
     setTimeout(() => {
       if (!!this.oldValue) {
         this.textInputFormControl.setValue(this.oldValue);
       }
-      // this.store.dispatch(ClearSuggestionsAction());
     }, 100);
+  }
+
+  private hackGetTextWidth(text: string): number {
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    ctx.font = "14px Roboto";
+    var width = ctx.measureText(text).width;
+    canvas.remove();
+    // text width + padding + clear button + dropdown button + margin + extra for luck
+    return width + 16 + 24 + 24 + 10 + 16
   }
 }

@@ -1,6 +1,6 @@
 import { createAction, props } from "@ngrx/store";
-import { Place } from '../types/place.type';
-import { PlaceResult, QueryAutocompletePrediction } from "../types/google-maps.type";
+import { Place } from '../types/place.types';
+import { PlaceResult, QueryAutocompletePrediction } from "../types/google-maps.types";
 
 export enum DayActionTypes {
     GET_SUGGECTIONS                  = '[Suggections] Get',
