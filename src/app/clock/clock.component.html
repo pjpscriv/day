@@ -20,20 +20,20 @@
 
   <!-- Labels -->
   <div *ngIf="data.sunrise as sunrise" class="clock__label_text" [style.transform]="sunrise.position">
-    <div *ngIf="data.sunrise.time !== null">{{ data.sunrise.time | date:"h:mma" }}</div>
-    <div>{{ data.sunrise.time === null ? "No " : "" }}Sunrise</div>
+    <div *ngIf="data.sunrise.time !== null">{{ data.sunrise.time | date:"h:mma" | lowercase }}</div>
+    <div>{{ data.sunrise.time === null ? "NO " : "" }}SUNRISE</div>
   </div>
   <div *ngIf="data.sunset as sunset" class="clock__label_text" [style.transform]="sunset.position">
-    <div *ngIf="data.sunset.time !== null">{{ data.sunset.time | date:"h:mma" }}</div>
-    <div>{{ data.sunset.time === null ? "No " : "" }}Sunset</div>
+    <div *ngIf="data.sunset.time !== null">{{ data.sunset.time | date:"h:mma" | lowercase }}</div>
+    <div>{{ data.sunset.time === null ? "NO " : "" }}SUNSET</div>
   </div>
   <div *ngIf="data.solarNoon as solarNoon" class="clock__label_text" [style.transform]="solarNoon.position">
-    <div>{{ data.solarNoon.time | date:"h:mma" }}</div>
-    <div>Solar Noon</div>
+    <div>{{ data.solarNoon.time | date:"h:mma" | lowercase }}</div>
+    <div>SOLAR NOON</div>
   </div>
   <div *ngIf="data.nadir as nadir" class="clock__label_text" [style.transform]="nadir.position">
-    <div>{{ data.nadir.time | date:"h:mma" }}</div>
-    <div>Midnight</div>
+    <div>{{ data.nadir.time | date:"h:mma" | lowercase }}</div>
+    <div>MIDNIGHT</div>
   </div>
 </div>
 

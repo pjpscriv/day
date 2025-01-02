@@ -137,11 +137,11 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
     return {
       sunrise: {
         time: sunrise,
-        position: this.getTranslation(sunrise ? this.getRotation(sunrise) : 0, sunrise ? LABEL_INDENT() : 50, false), 
+        position: this.getTranslation(sunrise ? this.getRotation(sunrise) : Math.PI * 0.5, sunrise ? LABEL_INDENT() : 40, false), 
       },
       sunset: {
         time: sunset,
-        position: this.getTranslation(sunset ? this.getRotation(sunset) : Math.PI, sunset ? LABEL_INDENT() : 50, false), 
+        position: this.getTranslation(sunset ? this.getRotation(sunset) : Math.PI * 1.5, sunset ? LABEL_INDENT() : 40, false), 
       },
       solarNoon: {
         time: solarNoon,
