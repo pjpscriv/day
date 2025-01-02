@@ -21,19 +21,19 @@
   <!-- Labels -->
   <div *ngIf="data.sunrise as sunrise" class="clock__label_text" [style.transform]="sunrise.position">
     <div *ngIf="data.sunrise.time !== null">{{ data.sunrise.time | date:"h:mma" | lowercase }}</div>
-    <div>{{ data.sunrise.time === null ? "NO " : "" }}SUNRISE</div>
+    <div class="clock__time-label">{{ data.sunrise.time === null ? "NO " : "" }}SUNRISE</div>
   </div>
   <div *ngIf="data.sunset as sunset" class="clock__label_text" [style.transform]="sunset.position">
     <div *ngIf="data.sunset.time !== null">{{ data.sunset.time | date:"h:mma" | lowercase }}</div>
-    <div>{{ data.sunset.time === null ? "NO " : "" }}SUNSET</div>
+    <div class="clock__time-label">{{ data.sunset.time === null ? "NO " : "" }}SUNSET</div>
   </div>
   <div *ngIf="data.solarNoon as solarNoon" class="clock__label_text" [style.transform]="solarNoon.position">
     <div>{{ data.solarNoon.time | date:"h:mma" | lowercase }}</div>
-    <div>SOLAR NOON</div>
+    <div class="clock__time-label">SOLAR NOON</div>
   </div>
   <div *ngIf="data.nadir as nadir" class="clock__label_text" [style.transform]="nadir.position">
     <div>{{ data.nadir.time | date:"h:mma" | lowercase }}</div>
-    <div>MIDNIGHT</div>
+    <div class="clock__time-label">MIDNIGHT</div>
   </div>
 </div>
 

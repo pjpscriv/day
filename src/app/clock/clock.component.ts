@@ -12,7 +12,7 @@ import { TimeDisplay } from '../types/timeDisplay.types';
 // TODO: Move to (UI?) constants file
 const NUMBER_OF_MINUTES = NUMBER_OF_HOURS * 6;
 const SUN_MOON_INDENT = 14;
-const LABEL_INDENT = () => window.innerWidth > 450 ? 25 : 35;
+const LABEL_INDENT = () => window.innerWidth > 450 ? 25 : 30;
 const HOUR_MARK_INDENT = 6;
 const MINUTE_MARK_INDENT = 4.5;
 const NOW_DOT_INDENT = 4;

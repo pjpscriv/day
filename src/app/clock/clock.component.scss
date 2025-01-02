@@ -108,8 +108,17 @@ clock:host * {
   transition: transform 0.1s;
 
   @media screen and (max-width: $font-breakpoint) {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1em;
+  }
+}
+
+.clock__time-label {
+  opacity: 0.8;
+  font-size: 1.5vmin;
+
+  @media screen and (max-width: $font-breakpoint) {
+    font-size: 10px;
   }
 }
 

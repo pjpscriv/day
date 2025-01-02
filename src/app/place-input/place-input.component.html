@@ -27,6 +27,7 @@
         <mat-autocomplete
           #auto="matAutocomplete"
           (optionSelected)="onLocationSelected($event)"
+          (opened)="onDropdownOpen()"
           [displayWith]="getDescription">
           <mat-option *ngFor="let option of autocompletePlaces$ | async" [value]="option">
             {{ option.description }}

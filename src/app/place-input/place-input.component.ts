@@ -15,7 +15,9 @@ import { Place, Wellington, DefaultPlace } from '../types/place.types';
 import { SuggestedLocationsStoreType } from '../state/day.state';
 import { QueryAutocompletePrediction } from '../types/google-maps.types';
 import { mostPopulatedCities } from '../types/suggested-locations.types';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
+const TEXT_BOX_MIN_WIDTH = 145;
 
 @Component({
   selector: 'place-input',
@@ -24,6 +26,7 @@ import { mostPopulatedCities } from '../types/suggested-locations.types';
 })
 export class PlaceInputComponent implements OnInit {
   @ViewChild('placeNameInput') nameInput!: ElementRef;
+  @ViewChild(MatAutocompleteTrigger) autocompleteInput!: MatAutocompleteTrigger;
 
   private place!: Place;
   private oldValue?: QueryAutocompletePrediction = undefined;
@@ -58,8 +61,10 @@ export class PlaceInputComponent implements OnInit {
     );
 
     this.autocompletePlaces$ = suggestedLocations$.pipe(
-      delay(50),
-      map((value: SuggestedLocationsStoreType) => {
+      delay(40),
+      map((value) => {
+        if (!!this.autocompleteInput)
+          this.autocompleteInput.updatePosition();
         return (!!value?.item) ? value.item : [];
       })
     )
@@ -69,7 +74,7 @@ export class PlaceInputComponent implements OnInit {
       map(([plce, suggs]: [Place, SuggestedLocationsStoreType]) => {
         const placeWidth = this.hackGetTextWidth(plce.name);
         const suggestionWidths = suggs.item?.map(s => this.hackGetTextWidth(s.description)) || [];
-        const width = Math.max(placeWidth, ...suggestionWidths);
+        const width = Math.max(placeWidth, ...suggestionWidths, TEXT_BOX_MIN_WIDTH);
         return `${width}px`;
       })
     )
@@ -157,6 +162,16 @@ export class PlaceInputComponent implements OnInit {
 
   public getDescription(option: any) {
     return option?.description;
+  }
+
+  public onDropdownOpen(): void {
+    console.log('onDropdownOpen');
+    this.autocompleteInput.openPanel();
+
+    setTimeout(() => {
+      this.autocompleteInput.updatePosition();
+      this.autocompleteInput.openPanel();
+    }, 30);
   }
 
   public onFocus(): void {
