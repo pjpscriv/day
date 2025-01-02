@@ -1,6 +1,6 @@
-import { Injectable } from "@angular/core";
+import { Injectable, NgZone } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, combineLatest, map, of, switchMap, tap } from "rxjs";
+import { catchError, combineLatest, filter, map, of, switchMap, tap, withLatestFrom } from "rxjs";
 import { GoogleMapsService } from "../place-input/google-maps/google-maps.service";
 import {
     GetCoordinatesFromApiAction,
@@ -8,8 +8,17 @@ import {
     GetCoordinatesFromApiSuccessAction,
     GetSuggestionsFromApiAction,
     GetSuggestionsFromApiFailureAction,
-    GetSuggestionsFromApiSuccessAction
+    GetSuggestionsFromApiSuccessAction,
+    GoogleMapsLoadedAction,
+    UpdatePlaceAction,
+    UpdateTimeAction
 } from "./day.actions";
+import { Router } from "@angular/router";
+import { PARAM_NAMES } from "../day.consts";
+import * as moment from 'moment';
+import { Place } from "../types/place.types";
+import { Store } from "@ngrx/store";
+import { selectFirstLoadPlaceId } from "./day.selectors";
 
 @Injectable({
     providedIn: 'root'
@@ -17,8 +26,11 @@ import {
 export class DayEffects {
 
     constructor(
+        private store: Store,
         private actions$: Actions,
-        private mapsService: GoogleMapsService
+        private mapsService: GoogleMapsService,
+        private router: Router,
+        private ngZone: NgZone
     ) {}
 
     public getSuggestionsFromApi$ = createEffect(() => this.actions$.pipe(
@@ -34,9 +46,68 @@ export class DayEffects {
         ofType(GetCoordinatesFromApiAction),
         switchMap((action) => combineLatest([
             this.mapsService.getPlaceDetails(action.placeId),
-            of(action.placeName)
+            of(action)
         ])),
-        map(([resp, name]) => GetCoordinatesFromApiSuccessAction({ response: resp[0], name: name })),
-        catchError(error => of(GetSuggestionsFromApiFailureAction({ errorMessage: error })))
+        map(([resp, actn]) => GetCoordinatesFromApiSuccessAction({ response: resp[0], name: actn.placeName, id: actn.placeId })),
+        catchError(error => of(GetCoordinatesFromApiFailureAction({ error: error })))
     ));
+
+    public getCoordinatesFromApiSuccess$ = createEffect(() => this.actions$.pipe(
+        ofType(GetCoordinatesFromApiSuccessAction),
+        filter(a => {
+            const invalid = !a.response?.geometry?.location || !a.response.utc_offset_minutes || !a.response.name;
+            if (invalid)
+                console.error('Insufficient data returned from Google Maps API', a.response);
+            return !invalid;
+        }),
+        map(action => {
+            const { response, name, id } = action;
+            const place: Place = {
+                name: !!name ? name : response!.formatted_address!,
+                latitude: response!.geometry!.location!.lat(),
+                longitude: response!.geometry!.location!.lng(),
+                utcOffset: response!.utc_offset_minutes!,
+                placeId: id
+            };
+            return UpdatePlaceAction({ place });
+        })
+    ));
+
+    public googleMapsLoaded$ = createEffect(() => this.actions$.pipe(
+        ofType(GoogleMapsLoadedAction),
+        withLatestFrom(this.store.select(selectFirstLoadPlaceId)),
+        filter(([_, placeId]) => !!placeId),
+        map(([_, placeId]) => GetCoordinatesFromApiAction({ placeId, placeName: '' }))
+    ));
+
+
+    // Param update effects
+    public updatePlace$ = createEffect(() => this.actions$.pipe(
+        ofType(UpdatePlaceAction),
+        tap(action => {
+            this.ngZone.run(() => {
+                const params = {
+                    [PARAM_NAMES.PLACE_ID]: action.place.placeId
+                };
+                console.log('Updating params!', params);
+                this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
+            });
+        })
+    ), { dispatch: false });
+
+    public updateTime$ = createEffect(() => this.actions$.pipe(
+        ofType(UpdateTimeAction),
+        map(action => moment(action.time).format('YYYY-MM-DD')),
+        tap(timeStr => {
+            this.ngZone.run(() => {
+                const today = moment().format('YYYY-MM-DD');
+                const params = { [PARAM_NAMES.TIME]: timeStr === today ? null : timeStr };
+                console.log('Updating params!', params);
+                this.router.navigate(['.'], { queryParams: params, queryParamsHandling: 'merge' });
+            });
+        })
+    ), { dispatch: false });
+
+
+    // Errors - should use material snackbar
 }

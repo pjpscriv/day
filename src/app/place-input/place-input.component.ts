@@ -6,6 +6,7 @@ import {
   ClearSuggestionsAction,
   GetCoordinatesFromApiAction,
   GetSuggestionsFromApiAction,
+  UpdateFirstLoadPlaceIdAction,
   UpdatePlaceAction,
   UpdateSuggestionsAction,
   UpdateTimeAction
@@ -16,6 +17,7 @@ import { SuggestedLocationsStoreType } from '../state/day.state';
 import { QueryAutocompletePrediction } from '../types/google-maps.types';
 import { mostPopulatedCities } from '../types/suggested-locations.types';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { PARAM_NAMES } from '../day.consts';
 
 const TEXT_BOX_MIN_WIDTH = 145;
 
@@ -46,7 +48,12 @@ export class PlaceInputComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.setToStartingPosition();
+    const placeIdParam = new URLSearchParams(window.location.search).get(PARAM_NAMES.PLACE_ID);
+    if (!!placeIdParam) {
+      this.store.dispatch(UpdateFirstLoadPlaceIdAction({ placeId: placeIdParam }));
+    } else {
+      this.setToStartingPosition();
+    }
 
     // Send API Query
     this.textInputFormControl.valueChanges.pipe(
@@ -82,6 +89,8 @@ export class PlaceInputComponent implements OnInit {
 
   public setToStartingPosition(): void {
     this.oldValue = undefined;
+
+    // TODO: Could probable shift this stuff into NgRx
     if (!navigator.geolocation) {
       console.log("Your browser is too old to share your location :'(");
       this.place = Wellington;

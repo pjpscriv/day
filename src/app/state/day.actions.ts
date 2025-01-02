@@ -3,18 +3,20 @@ import { Place } from '../types/place.types';
 import { PlaceResult, QueryAutocompletePrediction } from "../types/google-maps.types";
 
 export enum DayActionTypes {
-    GET_SUGGECTIONS                  = '[Suggections] Get',
-    GET_SUGGECTIONS_FROM_API         = '[Suggections] Get From API',
-    GET_SUGGECTIONS_FROM_API_SUCCESS = '[Suggections] Get From API Success',
-    GET_SUGGECTIONS_FROM_API_FAILURE = '[Suggections] Get From API Failure',
-    CLEAR_SUGGECTIONS                = '[Suggections] Clear',
-    UPDATE_SUGGESTIONS               = '[Suggections] Update',
-    GET_COORDINATES                  = '[Coordinates] Get',
-    GET_COORDINATES_FROM_API         = '[Coordinates] Get From API',
-    GET_COORDINATES_FROM_API_SUCCESS = '[Coordinates] Get From API Success',
-    GET_COORDINATES_FROM_API_FAILURE = '[Coordinates] Get From API Failure',
-    UPDATE_TIME_ACTION               = '[Time] Update',
-    UPDATE_PLACE_ACTION              = '[Place] Update'
+    GET_SUGGECTIONS                   = '[Suggections] Get',
+    GET_SUGGECTIONS_FROM_API          = '[Suggections] Get From API',
+    GET_SUGGECTIONS_FROM_API_SUCCESS  = '[Suggections] Get From API Success',
+    GET_SUGGECTIONS_FROM_API_FAILURE  = '[Suggections] Get From API Failure',
+    CLEAR_SUGGECTIONS                 = '[Suggections] Clear',
+    UPDATE_SUGGESTIONS                = '[Suggections] Update',
+    GET_COORDINATES                   = '[Coordinates] Get',
+    GET_COORDINATES_FROM_API          = '[Coordinates] Get From API',
+    GET_COORDINATES_FROM_API_SUCCESS  = '[Coordinates] Get From API Success',
+    GET_COORDINATES_FROM_API_FAILURE  = '[Coordinates] Get From API Failure',
+    UPDATE_TIME_ACTION                = '[Time] Update',
+    UPDATE_PLACE_ACTION               = '[Place] Update',
+    UPDATE_PLACE_ID_FIRST_LOAD_ACTION = '[Place] Set First Load Place ID', 
+    GOOGLE_MAPS_LOADED_ACTION         = '[Google Maps API] Loaded'
 }
 
 // Suggestions
@@ -55,12 +57,12 @@ export const GetCoordinatesFromApiAction = createAction(
 
 export const GetCoordinatesFromApiSuccessAction = createAction(
     DayActionTypes.GET_COORDINATES_FROM_API_SUCCESS,
-    props<{ response: PlaceResult | null, name: string }>()
+    props<{ response: PlaceResult | null, name: string, id: string }>()
 );
 
 export const GetCoordinatesFromApiFailureAction = createAction(
     DayActionTypes.GET_COORDINATES_FROM_API_FAILURE,
-    props<{ errorMessage: string }>()
+    props<{ error: any }>()
 );
 
 
@@ -75,4 +77,15 @@ export const UpdateTimeAction = createAction(
 export const UpdatePlaceAction = createAction(
   DayActionTypes.UPDATE_PLACE_ACTION,
   props<{ place: Place }>()
+)
+
+// First load place ID
+export const UpdateFirstLoadPlaceIdAction = createAction(
+    DayActionTypes.UPDATE_PLACE_ID_FIRST_LOAD_ACTION,
+    props<{ placeId: string }>()
+);
+
+// Google Maps API
+export const GoogleMapsLoadedAction = createAction(
+    DayActionTypes.GOOGLE_MAPS_LOADED_ACTION,
 )

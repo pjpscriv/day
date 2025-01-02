@@ -21,10 +21,11 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
-import { suggestionsReducer, placeReducer, timeReducer } from './state/day.reducer';
+import { suggestionsReducer, placeReducer, timeReducer, firstLoadPlaceIdReducer } from './state/day.reducer';
 import { DayEffects } from './state/day.effects';
 
 import { environment } from '../environments/environment';
+import { RouterModule } from '@angular/router';
 
 export const MY_FORMATS = {
   parse: {
@@ -47,6 +48,7 @@ export const MY_FORMATS = {
   ],
   imports: [
     BrowserModule,
+    RouterModule.forRoot([]),
     ReactiveFormsModule,
     NoopAnimationsModule,
     MatDatepickerModule,
@@ -59,7 +61,8 @@ export const MY_FORMATS = {
     StoreModule.forRoot({
       suggestedLocations: suggestionsReducer,
       time: timeReducer,
-      place: placeReducer
+      place: placeReducer,
+      firstLoadPlaceId: firstLoadPlaceIdReducer
     }),
     EffectsModule.forRoot([ DayEffects ]),
     StoreDevtoolsModule.instrument({maxAge: 25, logOnly: environment.production})

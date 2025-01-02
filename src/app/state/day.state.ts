@@ -13,6 +13,7 @@ export type DayState = {
     suggestedLocations: SuggestedLocationsStoreType;
     time: Date;
     place: Place;
+    firstLoadPlaceId?: string;
 }
 
 export const initialSuggestedLocations = { isLoading: false, item: [] };
@@ -21,5 +22,6 @@ export const initialTime = new Date();
 export const initialState: DayState = {
     suggestedLocations: initialSuggestedLocations,
     time: initialTime,
-    place: DefaultPlace
+    place: DefaultPlace,
+    firstLoadPlaceId: undefined
 }

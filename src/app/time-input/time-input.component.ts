@@ -1,10 +1,11 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { Store } from '@ngrx/store';
-import { MS_PER_DAY } from '../day.consts';
+import { MS_PER_DAY, PARAM_NAMES } from '../day.consts';
 import { UpdateTimeAction } from '../state/day.actions';
 import { selectTime } from '../state/day.selectors';
 import { Subject, filter, takeUntil, tap } from 'rxjs';
+import * as moment from 'moment';
 
 export const TIMEWARP_HOLD_DELAY = 500;
 export const TIMEWARP_INTERVAL = 20;
@@ -40,6 +41,10 @@ export class TimeInputComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
+    const timeParam = new URLSearchParams(window.location.search).get(PARAM_NAMES.TIME);
+    if (!!timeParam) {
+      this.time = moment(timeParam, 'YYYY-MM-DD', true).toDate();
+    }
     this.store.dispatch(UpdateTimeAction({ time: this.time }));
   }
 

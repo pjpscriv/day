@@ -39,7 +39,6 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private elRef: ElementRef,
     private store: Store
   ) {}
 

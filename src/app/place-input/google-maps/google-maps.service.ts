@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { bindCallback, Observable } from 'rxjs';
+import { GoogleMapsLoadedAction } from 'src/app/state/day.actions';
 import { GetDetailsObservable, GetQueryPredictionsObservable, PlaceDetailsResponse, QueryAutocompletionResponse } from 'src/app/types/google-maps.types';
 
 @Injectable({
@@ -11,6 +13,24 @@ export class GoogleMapsService {
   private getAutoCompQueryPredictionsFunc!: GetQueryPredictionsObservable;
   private getPlaceDetailsFunc!: GetDetailsObservable;
 
+  constructor(
+    private store: Store
+  ) {
+    // Hack to initialize the service
+    let initialised = false;
+    
+    const interval = setInterval(() => {
+      if (!initialised) {
+        try {
+          this.initService();
+          initialised = true;
+          clearInterval(interval);
+        } catch (e) {
+          console.error('Google Maps API not loaded yet');
+        }
+      }
+    }, 200);
+  }
 
   public initService(): void {
     this.autoCompService = new google.maps.places.AutocompleteService();
@@ -22,6 +42,8 @@ export class GoogleMapsService {
 
     let getDetailsBoundScope = this.placesService.getDetails.bind(this.placesService);
     this.getPlaceDetailsFunc = bindCallback(getDetailsBoundScope);
+
+    this.store.dispatch(GoogleMapsLoadedAction());
   }
 
   public getAutoCompQueyPredictions(text: string): Observable<QueryAutocompletionResponse> {

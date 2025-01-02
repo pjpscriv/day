@@ -1,10 +1,12 @@
 import { createReducer, on } from "@ngrx/store";
 import {
   ClearSuggestionsAction,
+  GetCoordinatesFromApiAction,
   GetCoordinatesFromApiSuccessAction,
   GetSuggestionsFromApiAction,
   GetSuggestionsFromApiFailureAction,
   GetSuggestionsFromApiSuccessAction,
+  UpdateFirstLoadPlaceIdAction,
   UpdatePlaceAction,
   UpdateSuggestionsAction,
   UpdateTimeAction
@@ -33,23 +35,17 @@ export const suggestionsReducer = createReducer(
 
 export const placeReducer = createReducer(
     initialState.place,
-    on(GetCoordinatesFromApiSuccessAction, (item, { response, name }) => {
-        if (!response?.geometry?.location || !response.utc_offset_minutes) {
-            console.error('Insufficient data returned from Google Maps API', response);
-            return item;
-        }
-        
-        return {
-            name: name,
-            latitude: response.geometry.location.lat(),
-            longitude: response.geometry.location.lng(),
-            utcOffset: response.utc_offset_minutes
-        };
-    }),
     on(UpdatePlaceAction, (_, { place }) => place)
 );
 
 export const timeReducer = createReducer(
     initialState.time,
     on(UpdateTimeAction, (_, { time}) => time)
+);
+
+export const firstLoadPlaceIdReducer = createReducer(
+    initialState.firstLoadPlaceId,
+    on(UpdateFirstLoadPlaceIdAction, (_, { placeId }) => placeId),
+    // After first load, set slice to undefined
+    on(GetCoordinatesFromApiAction, (_, a) => undefined)
 );
