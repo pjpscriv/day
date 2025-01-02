@@ -6,7 +6,7 @@
 
 // Radius
 $radius: min(75vw, calc((100vh - 120px) * 0.8));
-
+$font-breakpoint: 800px;
 
 // Host element
 clock:host {
@@ -93,6 +93,11 @@ clock:host * {
   font-size: 2.2vmin;
   line-height: 2.4vmin;
   text-wrap-mode: nowrap;
+
+  @media screen and (max-width: $font-breakpoint) {
+    font-size: 16px;
+    line-height: 1em;
+  }
 }
 
 
@@ -102,6 +107,10 @@ clock:host * {
   overflow: visible;
   width: calc($radius + 16px);
   height: calc($radius + 16px);
+
+  @media screen and (max-width: $font-breakpoint) {
+    font-size: 12px;
+  }
 
   // Uncomment to show SVG path
   // path {

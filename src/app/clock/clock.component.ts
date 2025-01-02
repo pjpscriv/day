@@ -12,7 +12,7 @@ import { TimeDisplay } from '../types/timeDisplay.type';
 // TODO: Move to (UI?) constants file
 const NUMBER_OF_MINUTES = NUMBER_OF_HOURS * 6;
 const SUN_MOON_INDENT = 14;
-const LABEL_INDENT = 25;
+const LABEL_INDENT = () => window.innerWidth > 450 ? 25 : 35;
 const HOUR_MARK_INDENT = 6;
 const MINUTE_MARK_INDENT = 4.5;
 const NOW_DOT_INDENT = 4;
@@ -137,20 +137,20 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
     return {
       sunrise: {
         time: sunrise,
-        position: this.getTranslation(sunrise ? this.getRotation(sunrise) : 0, sunrise ? 20 : 50, false), 
+        position: this.getTranslation(sunrise ? this.getRotation(sunrise) : 0, sunrise ? LABEL_INDENT() : 50, false), 
       },
       sunset: {
         time: sunset,
-        position: this.getTranslation(sunset ? this.getRotation(sunset) : Math.PI, sunset ? 20 : 50, false), 
+        position: this.getTranslation(sunset ? this.getRotation(sunset) : Math.PI, sunset ? LABEL_INDENT() : 50, false), 
       },
       solarNoon: {
         time: solarNoon,
-        position: this.getTranslation(solarNoon ? this.getRotation(solarNoon) : Math.PI, LABEL_INDENT, false), 
+        position: this.getTranslation(solarNoon ? this.getRotation(solarNoon) : Math.PI, LABEL_INDENT(), false), 
         dotPosition: this.getTranslation(solarNoon ? this.getRotation(solarNoon) : Math.PI, SUN_MOON_INDENT)
       },
       nadir: {
         time: nadir,
-        position: this.getTranslation(nadir ? this.getRotation(nadir) : Math.PI, LABEL_INDENT, false),
+        position: this.getTranslation(nadir ? this.getRotation(nadir) : Math.PI, LABEL_INDENT(), false),
         dotPosition: this.getTranslation(nadir ? this.getRotation(nadir) : 0, SUN_MOON_INDENT)
       }
     }
