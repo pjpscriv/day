@@ -86,10 +86,7 @@ export class DayEffects {
         ofType(UpdatePlaceAction),
         tap(action => {
             this.ngZone.run(() => {
-                const params = {
-                    [PARAM_NAMES.PLACE_ID]: action.place.placeId
-                };
-                console.log('Updating params!', params);
+                const params = { [PARAM_NAMES.PLACE_ID]: action.place.placeId };
                 this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
             });
         })
@@ -102,7 +99,6 @@ export class DayEffects {
             this.ngZone.run(() => {
                 const today = moment().format('YYYY-MM-DD');
                 const params = { [PARAM_NAMES.TIME]: timeStr === today ? null : timeStr };
-                console.log('Updating params!', params);
                 this.router.navigate(['.'], { queryParams: params, queryParamsHandling: 'merge' });
             });
         })

@@ -1,5 +1,6 @@
 import { QueryAutocompletePrediction } from "./google-maps.types";
 
+// Biggest cities in the world
 const tokyo = { description: 'Tokyo, Japan', place_id: 'ChIJ51cu8IcbXWARiRtXIothAS4', matched_substrings: [], terms: [], emoji: '🇯🇵' };
 const delhi = { description: 'Delhi, India', place_id: 'ChIJLbZ-NFv9DDkRQJY4FbcFcgM', matched_substrings: [], terms: [], emoji: '🇮🇳' };
 const shanghai = { description: 'Shanghai, China', place_id: 'ChIJMzz1sUBwsjURoWTDI5QSlQI', matched_substrings: [], terms: [], emoji: '🇨🇳' };
@@ -14,9 +15,14 @@ const newYork = { description: 'New York, NY, USA', place_id: 'ChIJOwg_06VPwokRY
 const tehran = { description: 'Tehran, Iran', place_id: 'ChIJ2dzzH0kAjj8RvCRwVnxps_A', matched_substrings: [], terms: [], emoji: '🇮🇷' };
 const karachi = { description: 'Karachi, Pakistan', place_id: 'ChIJv0sdZQY-sz4RIwxaVUQv-Zw', matched_substrings: [], terms: [], emoji: '🇵🇰' };
 
+// Coolest cities in the world
+const wellington = { description: 'Wellington, New Zealand', place_id: 'ChIJy3TpSfyxOG0RcLQTomPvAAo', matched_substrings: [], terms: [], emoji: '🇳🇿' };
+const montreal = { description: 'Montréal, Canada', place_id: 'ChIJDbdkHFQayUwR7-8fITgxTmU', matched_substrings: [], terms: [], emoji: '🇨🇦' };
+
 export const mostPopulatedCities: QueryAutocompletePrediction[] = [
     tokyo,
     delhi,
+    montreal,
     shanghai,
     saoPaulo,
     mexicoCity,
@@ -25,6 +31,7 @@ export const mostPopulatedCities: QueryAutocompletePrediction[] = [
     // beijing,
     dhaka,
     // osaka,
+    wellington,
     newYork,
     tehran,
     karachi
