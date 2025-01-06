@@ -55,7 +55,7 @@ export class DayEffects {
     public getCoordinatesFromApiSuccess$ = createEffect(() => this.actions$.pipe(
         ofType(GetCoordinatesFromApiSuccessAction),
         filter(a => {
-            const invalid = !a.response?.geometry?.location || !a.response.utc_offset_minutes || !a.response.name;
+            const invalid = !a.response?.geometry?.location || typeof a.response.utc_offset_minutes !== 'number' || !a.response.name;
             if (invalid)
                 console.error('Insufficient data returned from Google Maps API', a.response);
             return !invalid;
