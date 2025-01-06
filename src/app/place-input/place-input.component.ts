@@ -174,7 +174,7 @@ export class PlaceInputComponent implements OnInit {
   }
 
   public onDropdownOpen(): void {
-    console.log('onDropdownOpen');
+    // console.log('onDropdownOpen');
     this.autocompleteInput.openPanel();
 
     setTimeout(() => {
