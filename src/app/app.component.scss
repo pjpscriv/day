@@ -38,14 +38,15 @@ root:host {
   z-index: 100;
   text-align: center;
   max-width: 80%;
-  color: #ffffffcc;
+  color: #ffffffaa;
   display: flex;
   height: 0.5em;
   align-items: center;
   white-space: pre;
+  font-size: 12px;
 
   a {
-    color: #ffffffcc;
+    color: #ffffffaa;
   }
 
   a:hover {
